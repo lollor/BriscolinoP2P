@@ -1,0 +1,15 @@
+	Frame Login
+
+una volta loggati si passa al Form di connessione
+
+	Frame Connessione
+-gestisciConnessioni
+thread connessione sempre attivo riceve e risponde
+
+	Frame partita grafica della partita
+
+-comunicazione
+-carta
+-giocatore
+-tavolo(2giocatori e 40 carte)
+-stampa
