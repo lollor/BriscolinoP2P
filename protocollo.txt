@@ -6,6 +6,7 @@ porta invio random porta che riceve 12345.
 -instaura comunicazione
 -P1 invia: a;nome mittente;
 -P2 riceve e invia: y;nome;/n;;
+-P1 invia: y;
 salviamo porte, indirizzi, nome dell'avversario.
 -P che invia a;... fa il mazziere
 -P1 invia mazzo mescolato: m;1,f;2,f;3,f;8,f;9,c;....4,q;ultima carta arrivata è la briscola (valore,seme;) rimuoviamo le carte dalla pos [0]

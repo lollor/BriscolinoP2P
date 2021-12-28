@@ -7,7 +7,7 @@ package briscolinop2p;
 
 /**
  *
- * @author raia_lorenzo
+ * @author Lorenzo
  */
 public class JFrame extends javax.swing.JFrame {
 
