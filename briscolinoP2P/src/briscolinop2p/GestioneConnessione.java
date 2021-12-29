@@ -19,18 +19,20 @@ import jdk.jshell.spi.ExecutionControl;
  *
  * @author Lorenzo
  */
-public class GestioneRicezione extends Thread {
+public class GestioneConnessione extends Thread {
 
-    DatagramSocket socketRicezione;
-    InetAddress ipAddress;
+    private DatagramSocket socketRicezione;
+    private DatagramSocket socketInvio;
+    private InetAddress ipAddress;
     boolean connesso;
-    int faseConnessione;
+    private int faseConnessione;
     //0 - nessuno ha iniziato la connessione
     //1 - la connessione è stata iniziata da una delle due parti ed è arrivato/stato inviato il pacchetto "a;"
     //2 - la connessione è stata accettata 
 
-    public GestioneRicezione() throws SocketException {
+    public GestioneConnessione() throws SocketException {
         this.socketRicezione = new DatagramSocket(12345);
+        this.socketInvio = new DatagramSocket();
         this.connesso = false;
         this.faseConnessione = 0;
     }
@@ -49,7 +51,7 @@ public class GestioneRicezione extends Thread {
                 try {
                     gestisciPaccketto(new String(p.getData()).trim(), p.getAddress());
                 } catch (SocketException ex) {
-                    Logger.getLogger(GestioneRicezione.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(GestioneConnessione.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }).start();
         }
@@ -66,13 +68,13 @@ public class GestioneRicezione extends Thread {
                         String mioNome = JOptionPane.showInputDialog("Inserire nome");
                         nomeMittente = resto.split(";")[0].trim();
                         ipAddress = address;
-                        GestioneInvio.Invia("y;" + mioNome + ";", ipAddress);
+                        Invia("y;" + mioNome + ";", ipAddress);
                         faseConnessione = 1;
                     } else {
-                        GestioneInvio.Invia("n;", address);
+                        Invia("n;", address);
                     }
                 } else {
-                    GestioneInvio.Invia("n;", address);
+                    Invia("n;", address);
                 }
                 break;
             case 'y':
@@ -120,7 +122,7 @@ public class GestioneRicezione extends Thread {
 
     public boolean IniziaConnessione(InetAddress address, String nome) throws SocketException {
         //throw new UnsupportedOperationException("Not supported yet.");
-        GestioneInvio.Invia("a;" + nome + ";", address);
+        Invia("a;" + nome + ";", address);
         faseConnessione = 1;
         //timer di attesa della risposta, 20 secondi
         long time = System.currentTimeMillis();
@@ -141,10 +143,24 @@ public class GestioneRicezione extends Thread {
         if (faseConnessione != 2 || connesso) {
             return false;
         }
-        GestioneInvio.Invia("y;", address);
+        Invia("y;", address);
         connesso = true;
         JOptionPane.showMessageDialog(null, "Sono connesso a " + nomeMittente, "Connessione effettuata.", JOptionPane.INFORMATION_MESSAGE);
         return true;
     }
 
+    public void Invia(String data, InetAddress address) throws SocketException {
+        new Thread(() -> {
+            byte[] bufRisposta = data.getBytes();
+            try {
+                socketInvio.send(new DatagramPacket(bufRisposta, bufRisposta.length, address, 12345));
+            } catch (IOException ex) {
+                Logger.getLogger(GestioneConnessione.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }).start();
+    }
+
+    public InetAddress GetAddress(){
+        return ipAddress;
+    }
 }
