@@ -26,15 +26,20 @@ public class GestioneConnessione extends Thread {
     private InetAddress ipAddress;
     boolean connesso;
     private int faseConnessione;
+    private GestionePartita gestionePartita;
     //0 - nessuno ha iniziato la connessione
     //1 - la connessione è stata iniziata da una delle due parti ed è arrivato/stato inviato il pacchetto "a;"
     //2 - la connessione è stata accettata 
+    
+    //tutte le flag
+    boolean flagMazzoArrivato=false;
 
-    public GestioneConnessione() throws SocketException {
+    public GestioneConnessione(GestionePartita g) throws SocketException {
         this.socketRicezione = new DatagramSocket(12345);
         this.socketInvio = new DatagramSocket();
         this.connesso = false;
         this.faseConnessione = 0;
+        this.gestionePartita = g;
     }
 
     @Override
@@ -106,6 +111,7 @@ public class GestioneConnessione extends Thread {
                 }
                 break;
             case 'm':
+                //gestire anche flagMazzoArrivato
                 break;
             case 'b':
                 break;
