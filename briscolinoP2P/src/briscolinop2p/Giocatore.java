@@ -16,4 +16,5 @@ public class Giocatore {
     String punteggio;
     ArrayList<Carta> mano;//tre carte che ha in mano il giocatore
     
+    
 }

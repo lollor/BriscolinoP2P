@@ -5,6 +5,7 @@
  */
 package briscolinop2p;
 
+import java.net.SocketException;
 import java.util.ArrayList;
 
 /**
@@ -12,11 +13,11 @@ import java.util.ArrayList;
  * @author Lorenzo
  */
 public class Mazzo {
-    private ArrayList<Carta> mazzo;
+    public ArrayList<Carta> mazzo;
     private GestionePartita gestionePartita;
     
-    public Mazzo(GestionePartita gestionePartita) {
-        this.gestionePartita = gestionePartita;
+    public Mazzo() throws SocketException {
+        this.gestionePartita = GestionePartita.getPartita();
     }
     
     public void TogliCarta(){
@@ -26,6 +27,13 @@ public class Mazzo {
 
     public void Randomizzo() {
         java.util.Collections.shuffle(mazzo);
+    }
+    
+    public boolean vuoto(){
+        if(mazzo.isEmpty()){
+            return true;
+        }
+        return false;
     }
 
     @Override

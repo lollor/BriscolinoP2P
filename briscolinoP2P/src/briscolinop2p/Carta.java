@@ -13,7 +13,7 @@ public class Carta {
 
     private int numero;
     private char seme;
-    private String img;
+    public String img;
     private int punti;
 
     
