@@ -6,7 +6,7 @@
 package briscolinop2p;
 
 import briscolinop2p.Carta;
-import static briscolinop2p.GestionePartita.istanza;
+//import static briscolinop2p.GestionePartita.istanza;
 import briscolinop2p.Giocatore;
 import java.net.SocketException;
 import java.util.ArrayList;

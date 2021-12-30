@@ -5,12 +5,14 @@
  */
 package briscolinop2p;
 
-import static briscolinop2p.GestionePartita.istanza;
+//import static briscolinop2p.GestionePartita.istanza;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -21,7 +23,8 @@ import jdk.jshell.spi.ExecutionControl;
  * @author Lorenzo
  */
 public class GestioneConnessione extends Thread {
-    static GestioneConnessione istanza;
+
+    private static GestioneConnessione istanza = null;
     private DatagramSocket socketRicezione;
     private DatagramSocket socketInvio;
     private InetAddress ipAddress;
@@ -31,9 +34,9 @@ public class GestioneConnessione extends Thread {
     //0 - nessuno ha iniziato la connessione
     //1 - la connessione è stata iniziata da una delle due parti ed è arrivato/stato inviato il pacchetto "a;"
     //2 - la connessione è stata accettata 
-    
+
     //tutte le flag
-    boolean flagMazzoArrivato=false;
+    boolean flagMazzoArrivato = false;
 
     public static synchronized GestioneConnessione getConnessione() throws SocketException {
         if (istanza == null) {
@@ -41,8 +44,9 @@ public class GestioneConnessione extends Thread {
         }
         return istanza;
     }
-    
+
     public GestioneConnessione() throws SocketException {
+        istanza = this;
         this.socketRicezione = new DatagramSocket(12345);
         this.socketInvio = new DatagramSocket();
         this.connesso = false;
@@ -58,7 +62,7 @@ public class GestioneConnessione extends Thread {
             try {
                 socketRicezione.receive(p);
             } catch (IOException ex) {
-                System.out.println("Eccezione ricevimento pacchetto nella run della classe GestionePacchetto.\nErrore: " + ex.getLocalizedMessage());
+                System.out.println("Eccezione ricevimento pacchetto nella run della classe GestioneConnessione.\nErrore: " + ex.getLocalizedMessage());
             }
             new Thread(() -> {
                 try {
@@ -71,6 +75,7 @@ public class GestioneConnessione extends Thread {
     }
 
     private void gestisciPaccketto(String data, InetAddress address) throws SocketException {
+        System.out.println("IN [" + data + "] [" + address + "]");
         char tipoRichiesta = data.charAt(0);
         String resto = data.substring(data.indexOf(";") + 1);
         switch (tipoRichiesta) {
@@ -97,7 +102,8 @@ public class GestioneConnessione extends Thread {
                             //arrivato pacchetto dopo che io ho inviato "y;mioNome;"
                             faseConnessione = 2;
                             connesso = true;
-                        } else if (!resto.equals("")){
+                            gestionePartita.IniziaPartita(false);
+                        } else if (!resto.equals("")) {
                             //arrivato pacchetto "y;suoNome;"
                             nomeMittente = resto.split(";")[0].trim();
                             faseConnessione = 2;
@@ -145,7 +151,7 @@ public class GestioneConnessione extends Thread {
                 connesso = false;
                 faseConnessione = 0;
                 nomeMittente = "";
-                JOptionPane.showConfirmDialog(null, "Richiesta scaduta.", "Errore", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+                Util.ShowDialog("Richiesta scaduta.", "Errore");
                 return false;
             }
             //funzione che non fa niente
@@ -159,11 +165,14 @@ public class GestioneConnessione extends Thread {
         }
         Invia("y;", address);
         connesso = true;
-        JOptionPane.showMessageDialog(null, "Sono connesso a " + nomeMittente, "Connessione effettuata.", JOptionPane.INFORMATION_MESSAGE);
+        gestionePartita.IniziaPartita(true);
+        
+        Util.ShowDialog("Sono connesso a " + nomeMittente, "Connessione effettuata.");
         return true;
     }
 
     public void Invia(String data, InetAddress address) throws SocketException {
+        System.out.println("OUT [" + data + "] [" + address + "]");
         new Thread(() -> {
             byte[] bufRisposta = data.getBytes();
             try {
@@ -174,7 +183,7 @@ public class GestioneConnessione extends Thread {
         }).start();
     }
 
-    public InetAddress GetAddress(){
+    public InetAddress GetAddress() {
         return ipAddress;
     }
 }

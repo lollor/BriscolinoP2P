@@ -24,13 +24,15 @@ import javax.swing.ImageIcon;
 public class JFrame extends javax.swing.JFrame {
 
     Tavolo t;
-
+    GestioneConnessione gestisci;
     /**
      * Creates new form JFrame
      */
     public JFrame() throws SocketException {
         initComponents();
         t = Tavolo.getTavolo();
+        gestisci = GestioneConnessione.getConnessione();
+        gestisci.start();
     }
 
     @Override
