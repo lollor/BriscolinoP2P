@@ -15,15 +15,24 @@ import javax.swing.JOptionPane;
 public class GestionePartita extends Thread {
 
     //Giocatore giocatoreLocale, giocatoreEsterno;
+    static GestionePartita istanza;
     private Mazzo mazzo;
     private GestioneConnessione gestioneConnessione;
     boolean sonoMazziere;
     boolean partitaFinita;
 
-    public GestionePartita(GestioneConnessione gestioneConnessione) {
+ 
+    public GestionePartita() throws SocketException {
         this.partitaFinita = false;
         this.sonoMazziere = false;
-        this.gestioneConnessione = gestioneConnessione;
+        this.gestioneConnessione = GestioneConnessione.getConnessione();
+    }
+    
+     public static synchronized GestionePartita getPartita() throws SocketException {
+        if (istanza == null) {
+            istanza = new GestionePartita();
+        }
+        return istanza;
     }
 
     @Override

@@ -5,6 +5,7 @@
  */
 package briscolinop2p;
 
+import static briscolinop2p.GestionePartita.istanza;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -20,7 +21,7 @@ import jdk.jshell.spi.ExecutionControl;
  * @author Lorenzo
  */
 public class GestioneConnessione extends Thread {
-
+    static GestioneConnessione istanza;
     private DatagramSocket socketRicezione;
     private DatagramSocket socketInvio;
     private InetAddress ipAddress;
@@ -34,12 +35,19 @@ public class GestioneConnessione extends Thread {
     //tutte le flag
     boolean flagMazzoArrivato=false;
 
-    public GestioneConnessione(GestionePartita g) throws SocketException {
+    public static synchronized GestioneConnessione getConnessione() throws SocketException {
+        if (istanza == null) {
+            istanza = new GestioneConnessione();
+        }
+        return istanza;
+    }
+    
+    public GestioneConnessione() throws SocketException {
         this.socketRicezione = new DatagramSocket(12345);
         this.socketInvio = new DatagramSocket();
         this.connesso = false;
         this.faseConnessione = 0;
-        this.gestionePartita = g;
+        this.gestionePartita = GestionePartita.getPartita();
     }
 
     @Override

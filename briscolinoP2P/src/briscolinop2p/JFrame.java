@@ -5,6 +5,10 @@
  */
 package briscolinop2p;
 
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Image;
+
 /**
  *
  * @author Lorenzo
@@ -17,6 +21,30 @@ public class JFrame extends javax.swing.JFrame {
     public JFrame() {
         initComponents();
     }
+
+    @Override
+    public void paint(Graphics g) {
+        Graphics offgc;
+    Image offscreen = null;
+    Dimension d = getSize();
+
+    // create the offscreen buffer and associated Graphics
+    offscreen = createImage(d.width, d.height);
+    offgc = offscreen.getGraphics();
+    // clear the exposed area
+    offgc.setColor(getBackground());
+    offgc.fillRect(0, 0, d.width, d.height);
+    offgc.setColor(getForeground());
+    // do normal redraw
+    grafica(offgc);
+    // transfer offscreen to window
+    g.drawImage(offscreen, 0, 0, this);
+    }
+    
+    public void grafica(Graphics g) {
+        
+    }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -33,11 +61,11 @@ public class JFrame extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGap(0, 933, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGap(0, 581, Short.MAX_VALUE)
         );
 
         pack();
