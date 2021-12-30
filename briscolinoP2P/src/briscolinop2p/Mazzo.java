@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * @author Lorenzo
  */
 public class Mazzo {
-    private ArrayList<Integer> mazzo;
+    private ArrayList<Carta> mazzo;
     private GestionePartita gestionePartita;
     
     public Mazzo(GestionePartita gestionePartita) {
