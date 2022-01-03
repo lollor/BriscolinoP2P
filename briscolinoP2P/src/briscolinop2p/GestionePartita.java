@@ -18,16 +18,19 @@ public class GestionePartita extends Thread {
 
     //Giocatore giocatoreLocale, giocatoreEsterno;
     private static GestionePartita istanza = null;
-    private Mazzo mazzo;
+    //private Mazzo mazzo;
     private GestioneConnessione gestioneConnessione;
     boolean sonoMazziere;
     boolean partitaFinita;
-
+    boolean turnoMio;
+    public Tavolo tavolo;
+    
     public GestionePartita() throws SocketException {
         istanza = this;
         this.partitaFinita = false;
         this.sonoMazziere = false;
         this.gestioneConnessione = GestioneConnessione.getConnessione();
+        this.tavolo = new Tavolo();
     }
 
     public static synchronized GestionePartita getPartita() throws SocketException {
@@ -37,11 +40,17 @@ public class GestionePartita extends Thread {
         return istanza;
     }
 
+    boolean primaMano = true;
     @Override
     public void run() {
         while (true) {
             while (!partitaFinita) {
-
+                if (turnoMio){
+                    if (primaMano){
+                        while (JFrame.CartaSelezionata==null) assert true;
+                        
+                    }
+                }
             }
         }
     }
@@ -49,9 +58,22 @@ public class GestionePartita extends Thread {
     public void IniziaPartita(boolean sonoMazziere) {
         this.sonoMazziere = sonoMazziere;
         if (sonoMazziere) {
-            if (InviaMazzo()) {
-
+            if (!InviaMazzo()) {
+                return;
             }
+            for (int i = 0; i < 3; i++) {
+                while (!gestioneConnessione.flagAltroHaPescato) assert true;
+                gestioneConnessione.flagAltroHaPescato = false;
+                tavolo.GetGiocatore(true).AggiungiCartaAllaMano(tavolo.GetCarta());
+            }
+            this.turnoMio = false;
+        } else {
+            for (int i = 0; i < 3; i++) {
+                tavolo.GetGiocatore(true).AggiungiCartaAllaMano(tavolo.GetCarta());
+                while (!gestioneConnessione.flagAltroHaPescato) assert true;
+                gestioneConnessione.flagAltroHaPescato = false;
+            }
+            this.turnoMio = true;
         }
         start();
     }
@@ -59,10 +81,10 @@ public class GestionePartita extends Thread {
     public boolean InviaMazzo() {
         if (sonoMazziere) {
             //genero
-            mazzo.Randomizzo();
+            tavolo.RandomizzoMazzo();
             try {
                 //invio mazzo
-                gestioneConnessione.Invia("m;" + mazzo, gestioneConnessione.GetAddress());
+                gestioneConnessione.Invia("m;" + tavolo.GetMazzo(), gestioneConnessione.GetAddress());
             } catch (SocketException ex) {
                 Logger.getLogger(GestionePartita.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -75,7 +97,7 @@ public class GestionePartita extends Thread {
                     if (!provatoAMandare) {
                         try {
                             //invio mazzo
-                            gestioneConnessione.Invia("m;" + mazzo, gestioneConnessione.GetAddress());
+                            gestioneConnessione.Invia("m;" + tavolo.GetMazzo(), gestioneConnessione.GetAddress());
                             timer = 15000;
                             provatoAMandare = true;
                         } catch (SocketException ex) {

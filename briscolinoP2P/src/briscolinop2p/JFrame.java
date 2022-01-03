@@ -25,6 +25,7 @@ public class JFrame extends javax.swing.JFrame {
 
     Tavolo t;
     GestioneConnessione gestisci;
+    static Carta CartaSelezionata=null;
     /**
      * Creates new form JFrame
      */
@@ -71,10 +72,10 @@ public class JFrame extends javax.swing.JFrame {
         }
 
         if (GestionePartita.getPartita().sonoMazziere) {
-            stampaManoSotto(t.mazziere.mano);
+            stampaManoSotto(t.ioGiocatore.mano);
             stampaManoSopra(t.Sfidante.mano);
         } else {
-            stampaManoSopra(t.mazziere.mano);
+            stampaManoSopra(t.ioGiocatore.mano);
             stampaManoSotto(t.Sfidante.mano);
         }
 

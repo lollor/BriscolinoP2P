@@ -37,6 +37,7 @@ public class GestioneConnessione extends Thread {
 
     //tutte le flag
     boolean flagMazzoArrivato = false;
+    boolean flagAltroHaPescato = false;
 
     public static synchronized GestioneConnessione getConnessione() throws SocketException {
         if (istanza == null) {
@@ -44,6 +45,7 @@ public class GestioneConnessione extends Thread {
         }
         return istanza;
     }
+    
 
     public GestioneConnessione() throws SocketException {
         istanza = this;
@@ -130,6 +132,8 @@ public class GestioneConnessione extends Thread {
             case 'b':
                 break;
             case 'p':
+                gestionePartita.tavolo.GetCarta();
+                flagAltroHaPescato = true;
                 break;
             case 'f':
                 break;

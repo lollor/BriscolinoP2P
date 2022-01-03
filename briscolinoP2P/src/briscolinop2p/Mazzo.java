@@ -13,16 +13,21 @@ import java.util.ArrayList;
  * @author Lorenzo
  */
 public class Mazzo {
-    public ArrayList<Carta> mazzo;
+    private ArrayList<Carta> mazzo;
     private GestionePartita gestionePartita;
     
     public Mazzo() throws SocketException {
         this.gestionePartita = GestionePartita.getPartita();
     }
     
-    public void TogliCarta(){
-        if (!gestionePartita.partitaFinita)
-            mazzo.remove(0);
+    public Carta TogliCarta(){
+        if (!gestionePartita.partitaFinita){
+            Carta carta = mazzo.get(0);
+            if (mazzo.remove(carta))
+                return carta;
+            else return null;
+        }
+        return null;
     }
 
     public void Randomizzo() {

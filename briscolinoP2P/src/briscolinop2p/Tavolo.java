@@ -16,23 +16,42 @@ import java.util.ArrayList;
  * @author gerosa_simone
  */
 public class Tavolo {
+
     static Tavolo istanza;
-    Mazzo mazzo;
-    Giocatore mazziere;
-    Giocatore Sfidante;
+    private Mazzo mazzo;
+    private Giocatore ioGiocatore;
+    private Giocatore Sfidante;
+    private Carta briscola;
 
     public Tavolo() {
         this.mazzo = null;
-        this.mazziere = null;
+        this.ioGiocatore = null;
         this.Sfidante = null;
+        this.briscola = null;
     }
-    
-    
-      public static synchronized Tavolo getTavolo() throws SocketException {
+
+    public static synchronized Tavolo getTavolo() throws SocketException {
         if (istanza == null) {
             istanza = new Tavolo();
         }
         return istanza;
+    }
+    
+    public synchronized Carta GetCarta(){
+        return mazzo.TogliCarta();
+    }
+    
+    public void RandomizzoMazzo(){
+        mazzo.Randomizzo();
+    }
+    
+    public Mazzo GetMazzo(){
+        return mazzo;
+    }
+    
+    public Giocatore GetGiocatore(boolean io){
+        if (io) return ioGiocatore;
+        else return Sfidante;
     }
 
 }
