@@ -25,14 +25,14 @@ public class JFrame extends javax.swing.JFrame {
 
     Tavolo t;
     GestioneConnessione gestisci;
-    static Carta CartaSelezionata=null;
+    volatile static Carta CartaSelezionata=null;
     /**
      * Creates new form JFrame
      */
     public JFrame() throws SocketException {
         initComponents();
         t = Tavolo.getTavolo();
-        gestisci = GestioneConnessione.getConnessione();
+        gestisci = GestioneConnessione.getInstance();
         gestisci.start();
     }
 
@@ -71,7 +71,7 @@ public class JFrame extends javax.swing.JFrame {
             mazzo2.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/vuota.gif"))));
         }
 
-        if (GestionePartita.getPartita().sonoMazziere) {
+        if (GestionePartita.getInstance().sonoMazziere) {
             stampaManoSotto(t.ioGiocatore.mano);
             stampaManoSopra(t.Sfidante.mano);
         } else {
@@ -136,6 +136,23 @@ public class JFrame extends javax.swing.JFrame {
             av2.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/vuota.gif"))));
             av3.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/vuota.gif"))));
         }
+    }
+    
+    
+    //PER MOSTRARE LE CARTE SUL TAVOLO TI CONSIGLIO DI FARE UN THREAD CHE IN CONTINUAZIONE PRENDE L'ARRAY 
+    //DI CARTE DAL TAVOLO E LO MOSTRA
+    //TI FACCIO LA FUNZIONE POI TU SAI QUELLO CHE C'E DA METTERE DENTRO
+    public void mostraCarteSulTavolo(){
+        new Thread(() -> {
+            while (true){
+                //mostra tutte le carte del tavolo
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(JFrame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }).start();
     }
 
     /**

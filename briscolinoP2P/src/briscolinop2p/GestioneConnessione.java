@@ -36,15 +36,18 @@ public class GestioneConnessione extends Thread {
     //2 - la connessione è stata accettata 
 
     //tutte le flag
-    boolean flagMazzoArrivato = false;
-    boolean flagAltroHaPescato = false;
-
-    public static synchronized GestioneConnessione getConnessione() throws SocketException {
+    volatile boolean flagMazzoArrivato = false;
+    volatile boolean flagAltroHaPescato = false;
+    volatile Carta flagCartaButtataDallAltro = null;
+    volatile boolean flagAltroHaDatoPunteggio = false;
+    
+    public static synchronized GestioneConnessione getInstance() throws SocketException {
         if (istanza == null) {
             istanza = new GestioneConnessione();
         }
         return istanza;
     }
+    
     
 
     public GestioneConnessione() throws SocketException {
@@ -53,7 +56,7 @@ public class GestioneConnessione extends Thread {
         this.socketInvio = new DatagramSocket();
         this.connesso = false;
         this.faseConnessione = 0;
-        this.gestionePartita = GestionePartita.getPartita();
+        this.gestionePartita = GestionePartita.getInstance();
     }
 
     @Override
@@ -130,9 +133,17 @@ public class GestioneConnessione extends Thread {
                 //gestire anche flagMazzoArrivato
                 break;
             case 'b':
+                Carta carta = Carta.creaCarta(resto.split(";")[0].trim());
+                if (gestionePartita.tavolo.AggiungiCartaSulTavolo(carta)){
+                    if (!gestionePartita.turnoMio){
+                        
+                    }
+                } else {
+                    System.out.println("Errore nell'aggiungere la carta sul tavolo nel case 'b' della funzione GestionePacchetto della classe GestioneConnessione");
+                }
                 break;
             case 'p':
-                gestionePartita.tavolo.GetCarta();
+                gestionePartita.tavolo.GetCarta(false);
                 flagAltroHaPescato = true;
                 break;
             case 'f':
@@ -145,7 +156,6 @@ public class GestioneConnessione extends Thread {
     private String nomeMittente;
 
     public boolean IniziaConnessione(InetAddress address, String nome) throws SocketException {
-        //throw new UnsupportedOperationException("Not supported yet.");
         Invia("a;" + nome + ";", address);
         faseConnessione = 1;
         //timer di attesa della risposta, 20 secondi

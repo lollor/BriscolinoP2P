@@ -16,7 +16,7 @@ import javax.swing.JOptionPane;
  */
 public class GestionePartita extends Thread {
 
-    //Giocatore giocatoreLocale, giocatoreEsterno;
+    Giocatore giocatoreLocale, giocatoreEsterno;
     private static GestionePartita istanza = null;
     //private Mazzo mazzo;
     private GestioneConnessione gestioneConnessione;
@@ -24,16 +24,18 @@ public class GestionePartita extends Thread {
     boolean partitaFinita;
     boolean turnoMio;
     public Tavolo tavolo;
-    
+
     public GestionePartita() throws SocketException {
         istanza = this;
         this.partitaFinita = false;
         this.sonoMazziere = false;
-        this.gestioneConnessione = GestioneConnessione.getConnessione();
+        this.gestioneConnessione = GestioneConnessione.getInstance();
         this.tavolo = new Tavolo();
+        giocatoreLocale = tavolo.GetGiocatore(true);
+        giocatoreEsterno = tavolo.GetGiocatore(false);
     }
 
-    public static synchronized GestionePartita getPartita() throws SocketException {
+    public static synchronized GestionePartita getInstance() throws SocketException {
         if (istanza == null) {
             istanza = new GestionePartita();
         }
@@ -41,14 +43,29 @@ public class GestionePartita extends Thread {
     }
 
     boolean primaMano = true;
+
     @Override
     public void run() {
         while (true) {
             while (!partitaFinita) {
-                if (turnoMio){
-                    if (primaMano){
-                        while (JFrame.CartaSelezionata==null) assert true;
-                        
+                if (turnoMio) {
+                    if (primaMano) {
+                        while (JFrame.CartaSelezionata == null) {
+                            assert true;
+                        }
+                        Carta cartaSelezionata = JFrame.CartaSelezionata;
+                        if (giocatoreLocale.TogliCartaDallaMano(cartaSelezionata)){
+                            tavolo.AggiungiCartaSulTavolo(cartaSelezionata);
+                            try {
+                                gestioneConnessione.Invia("b;"+cartaSelezionata+";", gestioneConnessione.GetAddress());
+                            } catch (SocketException ex) {
+                                System.out.println("Errore nell'invia della run della classe GestionePartita");
+                            }
+                            //mossa avversario
+                            while (!gestioneConnessione.flagAltroHaDatoPunteggio) assert true;
+                        } else {
+                            System.out.println("Errore nel togliere la carta dalla mano nella run della classe GestionePartita");
+                        }
                     }
                 }
             }
@@ -62,18 +79,22 @@ public class GestionePartita extends Thread {
                 return;
             }
             for (int i = 0; i < 3; i++) {
-                while (!gestioneConnessione.flagAltroHaPescato) assert true;
+                while (!gestioneConnessione.flagAltroHaPescato) {
+                    assert true;
+                }
                 gestioneConnessione.flagAltroHaPescato = false;
-                tavolo.GetGiocatore(true).AggiungiCartaAllaMano(tavolo.GetCarta());
-            }
-            this.turnoMio = false;
-        } else {
-            for (int i = 0; i < 3; i++) {
-                tavolo.GetGiocatore(true).AggiungiCartaAllaMano(tavolo.GetCarta());
-                while (!gestioneConnessione.flagAltroHaPescato) assert true;
-                gestioneConnessione.flagAltroHaPescato = false;
+                giocatoreLocale.AggiungiCartaAllaMano(tavolo.GetCarta(true));
             }
             this.turnoMio = true;
+        } else {
+            for (int i = 0; i < 3; i++) {
+                giocatoreLocale.AggiungiCartaAllaMano(tavolo.GetCarta(true));
+                while (!gestioneConnessione.flagAltroHaPescato) {
+                    assert true;
+                }
+                gestioneConnessione.flagAltroHaPescato = false;
+            }
+            this.turnoMio = false;
         }
         start();
     }
@@ -116,7 +137,10 @@ public class GestionePartita extends Thread {
             }
             //inizia partita
             return true;
-        } else return false;
+        } else {
+            return false;
+        }
     }
 
+    
 }

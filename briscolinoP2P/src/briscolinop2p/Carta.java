@@ -37,11 +37,26 @@ public class Carta {
                     
     }
     
-    public Carta creaCarta(String s){
+    public static Carta creaCarta(String s){
         String[] dati=s.split(",");
         Carta c=new Carta(Integer.parseInt(dati[0]),dati[1].charAt(0));
         return c;
     }
+
+    public char getSeme() {
+        return seme;
+    }
+
+    public int getNumero() {
+        return numero;
+    }
+
+    public int getPunti() {
+        return punti;
+    }
     
-    
+    @Override
+    public String toString() {
+        return numero + "," + seme;
+    }   
 }

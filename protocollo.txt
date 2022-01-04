@@ -19,8 +19,8 @@ salviamo porte, indirizzi, nome dell'avversario.
 (quando peschi e non ci son carte non aggiunge nulla)
 ripete all'infinito{
 	-P2 deve iniziare, prende dal suo vettore di 3, rimuove carta, la carica nel tavolo e la invia a P1: b;3,f;
-	-P1 riceve b;3,f; quindi la aggiunge al tavolo e prende dal suo vettore di 3, rimuove carta, la carica nel 	tavolo e la invia a P2: b;4,q;
-	-P1 che e l'ultimo che ha giocato (quindi tavolo pieno) calcola il vincitore e invia: w;/l; (rimuove carte 	dal tavolo)
+	-P1 riceve b;3,f; quindi la aggiunge al tavolo e prende dal suo vettore di 3, rimuove carta, la carica nel tavolo e la invia a P2: b;4,q;
+	-P1 che e l'ultimo che ha giocato (quindi tavolo pieno) calcola il vincitore e invia: w;/l; (rimuove carte dal tavolo)
 
 	se l:
 	significa che avversario ha perso quindi P2 rimuove carte dal tavolo e p1 prende carte dal tavolo e le 	aggiunge a carte prese e punti.

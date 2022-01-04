@@ -25,10 +25,19 @@ public class Giocatore {
 
     public boolean AggiungiCartaAllaMano(Carta carta) {
         if (mano.size() < 3) {
-            mano.add(carta);
-            return true;
-        } else {
-            return false;
+            if (mano.add(carta)) {
+                return true;
+            }
         }
+        return false;
+    }
+
+    public boolean TogliCartaDallaMano(Carta carta) {
+        if (mano.size() > 0) {
+            if (mano.remove(carta)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

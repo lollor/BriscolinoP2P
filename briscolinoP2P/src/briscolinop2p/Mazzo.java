@@ -17,7 +17,15 @@ public class Mazzo {
     private GestionePartita gestionePartita;
     
     public Mazzo() throws SocketException {
-        this.gestionePartita = GestionePartita.getPartita();
+        this.gestionePartita = GestionePartita.getInstance();
+    }
+    
+    public Carta GetCarta(int index){
+        return mazzo.get(index);
+    }
+    
+    public int GetSize(){
+        return mazzo.size();
     }
     
     public Carta TogliCarta(){
