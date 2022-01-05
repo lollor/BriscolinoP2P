@@ -34,16 +34,3 @@ ripete all'infinito{
 
         dopo che tutti e due hanno pescato rinizia da capo
 }
-
-quando non ci son piu carte sul tavolo e nel mazzo e nelle mani l'ultimo che gioca invia
-f;punti;
-
-risponde
-
-f;punti;
-
-
-implementazioni aggiuntive:
-1)sistema a elo e registrazione come chess.com implementando database
-
-

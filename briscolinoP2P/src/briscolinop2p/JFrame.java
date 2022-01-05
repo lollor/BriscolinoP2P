@@ -31,7 +31,6 @@ public class JFrame extends javax.swing.JFrame {
      */
     public JFrame() throws SocketException {
         initComponents();
-        t = Tavolo.getTavolo();
         gestisci = GestioneConnessione.getInstance();
         gestisci.start();
     }
@@ -62,7 +61,7 @@ public class JFrame extends javax.swing.JFrame {
     }
 
     public void grafica(Graphics g) throws SocketException, IOException {
-
+        
         t = Tavolo.getTavolo();
         if (!t.mazzo.vuoto()) {
             //se il mazzo non e vuoto stampo la carta mazzo
@@ -80,7 +79,6 @@ public class JFrame extends javax.swing.JFrame {
         }
 
         stampaMazzo(t.mazzo.mazzo);
-
     }
 
     public void stampaMazzo(ArrayList<Carta> m) throws IOException {

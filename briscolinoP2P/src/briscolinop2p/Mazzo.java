@@ -13,27 +13,55 @@ import java.util.ArrayList;
  * @author Lorenzo
  */
 public class Mazzo {
+
     private ArrayList<Carta> mazzo;
     private GestionePartita gestionePartita;
-    
+
     public Mazzo() throws SocketException {
+        mazzo = new ArrayList<Carta>(0);
+        for (int i = 0; i < 10; i++) {
+            mazzo.add(new Carta(i+1, 'f'));
+        }
+        for (int i = 0; i < 10; i++) {
+            mazzo.add(new Carta(i+1, 'c'));
+        }
+        for (int i = 0; i < 10; i++) {
+            mazzo.add(new Carta(i+1, 's'));
+        }
+        for (int i = 0; i < 10; i++) {
+            mazzo.add(new Carta(i+1, 'd'));
+        }
         this.gestionePartita = GestionePartita.getInstance();
     }
-    
-    public Carta GetCarta(int index){
+
+    public static Mazzo CreaMazzo(String[] vettoreCarte) throws SocketException {
+        Mazzo mazzo = new Mazzo();
+        if (vettoreCarte.length != 40) {
+            System.out.println("Il mazzo non ha 40 carte.");
+            return null;
+        }
+        for (String string : vettoreCarte) {
+            mazzo.mazzo.add(Carta.creaCarta(string));
+        }
+        return mazzo;
+    }
+
+    public Carta GetCarta(int index) {
         return mazzo.get(index);
     }
-    
-    public int GetSize(){
+
+    public int GetSize() {
         return mazzo.size();
     }
-    
-    public Carta TogliCarta(){
-        if (!gestionePartita.partitaFinita){
+
+    public Carta TogliCarta() {
+        if (!gestionePartita.partitaFinita) {
             Carta carta = mazzo.get(0);
-            if (mazzo.remove(carta))
+            if (mazzo.remove(carta)) {
                 return carta;
-            else return null;
+            } else {
+                return null;
+            }
         }
         return null;
     }
@@ -41,9 +69,9 @@ public class Mazzo {
     public void Randomizzo() {
         java.util.Collections.shuffle(mazzo);
     }
-    
-    public boolean vuoto(){
-        if(mazzo.isEmpty()){
+
+    public boolean vuoto() {
+        if (mazzo.isEmpty()) {
             return true;
         }
         return false;
@@ -51,12 +79,12 @@ public class Mazzo {
 
     @Override
     public String toString() {
-        String finale="";
+        String finale = "";
         //controllare che il toString della carta sia in uqesto modo "1,f"
         for (Carta carta : mazzo) {
-            finale+=carta+";";
+            finale += carta + ";";
         }
         return finale;
     }
-    
+
 }

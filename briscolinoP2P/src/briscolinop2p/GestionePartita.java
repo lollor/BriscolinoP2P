@@ -79,19 +79,20 @@ public class GestionePartita extends Thread {
                 return;
             }
             for (int i = 0; i < 3; i++) {
+                giocatoreLocale.AggiungiCartaAllaMano(tavolo.GetCarta(true));
                 while (!gestioneConnessione.flagAltroHaPescato) {
                     assert true;
                 }
                 gestioneConnessione.flagAltroHaPescato = false;
-                giocatoreLocale.AggiungiCartaAllaMano(tavolo.GetCarta(true));
             }
             this.turnoMio = true;
         } else {
+            while (!gestioneConnessione.flagAltroHaMandatoMazzo) assert true;
             for (int i = 0; i < 3; i++) {
-                giocatoreLocale.AggiungiCartaAllaMano(tavolo.GetCarta(true));
                 while (!gestioneConnessione.flagAltroHaPescato) {
                     assert true;
                 }
+                giocatoreLocale.AggiungiCartaAllaMano(tavolo.GetCarta(true));
                 gestioneConnessione.flagAltroHaPescato = false;
             }
             this.turnoMio = false;

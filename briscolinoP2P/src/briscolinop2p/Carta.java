@@ -37,6 +37,7 @@ public class Carta {
                     
     }
     
+    
     public static Carta creaCarta(String s){
         String[] dati=s.split(",");
         Carta c=new Carta(Integer.parseInt(dati[0]),dati[1].charAt(0));
@@ -58,5 +59,5 @@ public class Carta {
     @Override
     public String toString() {
         return numero + "," + seme;
-    }   
+    }
 }

@@ -24,6 +24,9 @@ import jdk.jshell.spi.ExecutionControl;
  */
 public class GestioneConnessione extends Thread {
 
+    private final int THISPORT = 12345;
+    private final int OTHERPORT = 12346;
+    
     private static GestioneConnessione istanza = null;
     private DatagramSocket socketRicezione;
     private DatagramSocket socketInvio;
@@ -40,6 +43,7 @@ public class GestioneConnessione extends Thread {
     volatile boolean flagAltroHaPescato = false;
     volatile Carta flagCartaButtataDallAltro = null;
     volatile boolean flagAltroHaDatoPunteggio = false;
+    volatile boolean flagAltroHaMandatoMazzo = false;
     
     public static synchronized GestioneConnessione getInstance() throws SocketException {
         if (istanza == null) {
@@ -49,10 +53,9 @@ public class GestioneConnessione extends Thread {
     }
     
     
-
     public GestioneConnessione() throws SocketException {
         istanza = this;
-        this.socketRicezione = new DatagramSocket(12345);
+        this.socketRicezione = new DatagramSocket(THISPORT);
         this.socketInvio = new DatagramSocket();
         this.connesso = false;
         this.faseConnessione = 0;
@@ -130,13 +133,16 @@ public class GestioneConnessione extends Thread {
                 }
                 break;
             case 'm':
-                //gestire anche flagMazzoArrivato
+                //salva mazzo
+                gestionePartita.tavolo.SetMazzo(Mazzo.CreaMazzo(resto.split(";")));
+                Invia("m;y;", address);
+                flagAltroHaMandatoMazzo = true;
                 break;
             case 'b':
                 Carta carta = Carta.creaCarta(resto.split(";")[0].trim());
                 if (gestionePartita.tavolo.AggiungiCartaSulTavolo(carta)){
                     if (!gestionePartita.turnoMio){
-                        
+                        Invia(gestionePartita.tavolo.CalcoloChiHaVintoMano(), address);
                     }
                 } else {
                     System.out.println("Errore nell'aggiungere la carta sul tavolo nel case 'b' della funzione GestionePacchetto della classe GestioneConnessione");
@@ -190,7 +196,7 @@ public class GestioneConnessione extends Thread {
         new Thread(() -> {
             byte[] bufRisposta = data.getBytes();
             try {
-                socketInvio.send(new DatagramPacket(bufRisposta, bufRisposta.length, address, 12345));
+                socketInvio.send(new DatagramPacket(bufRisposta, bufRisposta.length, address, OTHERPORT));
             } catch (IOException ex) {
                 Logger.getLogger(GestioneConnessione.class.getName()).log(Level.SEVERE, null, ex);
             }

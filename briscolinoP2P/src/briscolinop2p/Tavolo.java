@@ -24,7 +24,7 @@ public class Tavolo {
     private Giocatore ioGiocatore, Sfidante;
     private Carta briscola;
     private ArrayList<Carta> carteMostrate;
-    
+
     public Tavolo() {
         this.mazzo = null;
         this.ioGiocatore = null;
@@ -56,7 +56,7 @@ public class Tavolo {
 
     public void RandomizzoMazzo() {
         mazzo.Randomizzo();
-        briscola = mazzo.GetCarta(mazzo.GetSize()-1);
+        briscola = mazzo.GetCarta(mazzo.GetSize() - 1);
     }
 
     public Mazzo GetMazzo() {
@@ -71,18 +71,53 @@ public class Tavolo {
         }
     }
 
-    public boolean AggiungiCartaSulTavolo(Carta carta){
-        if (carteMostrate.size() == 0 || carteMostrate.size() == 1){
+    public void SetMazzo(Mazzo mazzo){
+        this.mazzo = mazzo;
+    }
+    
+    public boolean AggiungiCartaSulTavolo(Carta carta) {
+        if (carteMostrate.size() == 0 || carteMostrate.size() == 1) {
             carteMostrate.add(carta);
             return true;
-        } return false;
+        }
+        return false;
     }
-    
-    public void PulisciCarteTavolo(){
+
+    public void PulisciCarteTavolo() {
         carteMostrate = new ArrayList<Carta>(0);
     }
-    
-    public String CalcoloChiHaVintoMano(){
-        if (briscola.getSeme() == )
+
+    public String CalcoloChiHaVintoMano() {
+        Carta carta0 = carteMostrate.get(0), carta1 = carteMostrate.get(1);
+        if (briscola.getSeme() == carta0.getSeme() && briscola.getSeme() != carta1.getSeme()) {
+            return "w;";
+        } else if (briscola.getSeme() != carta0.getSeme() && briscola.getSeme() == carta1.getSeme()) {
+            return "l;";
+        } else if (briscola.getSeme() == carta0.getSeme() && briscola.getSeme() == carta1.getSeme()) {
+            if (carta0.getPunti() > carta1.getPunti()) {
+                return "w;";
+            } else if (carta0.getPunti() < carta1.getPunti()) {
+                return "l;";
+            } else {
+                if (carta0.getNumero() > carta1.getNumero()) {
+                    return "w;";
+                } else {
+                    return "l;";
+                }
+            }
+        } else if (carta0.getSeme() == carta1.getSeme()) {
+            if (carta0.getPunti() > carta1.getPunti()) {
+                return "w;";
+            } else if (carta0.getPunti() < carta1.getPunti()) {
+                return "l;";
+            } else {
+                if (carta0.getNumero() > carta1.getNumero()) {
+                    return "w;";
+                } else {
+                    return "l;";
+                }
+            }
+        }
+        return null;
     }
 }
