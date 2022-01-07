@@ -20,16 +20,16 @@ public class Mazzo {
     public Mazzo() throws SocketException {
         mazzo = new ArrayList<Carta>(0);
         for (int i = 0; i < 10; i++) {
-            mazzo.add(new Carta(i+1, 'f'));
+            mazzo.add(new Carta(i + 1, 'f'));
         }
         for (int i = 0; i < 10; i++) {
-            mazzo.add(new Carta(i+1, 'c'));
+            mazzo.add(new Carta(i + 1, 'c'));
         }
         for (int i = 0; i < 10; i++) {
-            mazzo.add(new Carta(i+1, 's'));
+            mazzo.add(new Carta(i + 1, 's'));
         }
         for (int i = 0; i < 10; i++) {
-            mazzo.add(new Carta(i+1, 'd'));
+            mazzo.add(new Carta(i + 1, 'd'));
         }
         this.gestionePartita = GestionePartita.getInstance();
     }
@@ -43,6 +43,10 @@ public class Mazzo {
         for (String string : vettoreCarte) {
             mazzo.mazzo.add(Carta.creaCarta(string));
         }
+        return mazzo;
+    }
+
+    public ArrayList<Carta> GetMazzo() {
         return mazzo;
     }
 

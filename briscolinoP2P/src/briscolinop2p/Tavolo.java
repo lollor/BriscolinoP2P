@@ -86,6 +86,9 @@ public class Tavolo {
     public void PulisciCarteTavolo() {
         carteMostrate = new ArrayList<Carta>(0);
     }
+    public ArrayList<Carta> GetCarteMostrate(){
+        return carteMostrate;
+    }
 
     public String CalcoloChiHaVintoMano() {
         Carta carta0 = carteMostrate.get(0), carta1 = carteMostrate.get(1);
