@@ -16,7 +16,7 @@ import javax.swing.JOptionPane;
  */
 public class GestionePartita extends Thread {
 
-    Giocatore giocatoreLocale, giocatoreEsterno;
+    //Giocatore giocatoreLocale, giocatoreEsterno;
     private static GestionePartita istanza = null;
     //private Mazzo mazzo;
     private GestioneConnessione gestioneConnessione;
@@ -31,8 +31,8 @@ public class GestionePartita extends Thread {
         this.sonoMazziere = false;
         this.gestioneConnessione = GestioneConnessione.getInstance();
         this.tavolo = new Tavolo();
-        giocatoreLocale = tavolo.GetGiocatore(true);
-        giocatoreEsterno = tavolo.GetGiocatore(false);
+        //giocatoreLocale = tavolo.GetGiocatore(true);
+        //giocatoreEsterno = tavolo.GetGiocatore(false);
     }
 
     public static synchronized GestionePartita getInstance() throws SocketException {
@@ -54,22 +54,32 @@ public class GestionePartita extends Thread {
                             assert true;
                         }
                         Carta cartaSelezionata = JFrame.CartaSelezionata;
-                        if (giocatoreLocale.TogliCartaDallaMano(cartaSelezionata)){
+                        System.out.println("Ho selezionato la carta "+cartaSelezionata);
+                        if (giocatoreLocale().TogliCartaDallaMano(cartaSelezionata)) {
                             tavolo.AggiungiCartaSulTavolo(cartaSelezionata);
                             try {
-                                gestioneConnessione.Invia("b;"+cartaSelezionata+";", gestioneConnessione.GetAddress());
+                                gestioneConnessione.Invia("b;" + cartaSelezionata + ";", gestioneConnessione.GetAddress());
                             } catch (SocketException ex) {
                                 System.out.println("Errore nell'invia della run della classe GestionePartita");
                             }
                             //mossa avversario
-                            while (!gestioneConnessione.flagAltroHaDatoPunteggio) assert true;
+                            while (!gestioneConnessione.flagAltroHaDatoPunteggio) {
+                                assert true;
+                            }
                         } else {
                             System.out.println("Errore nel togliere la carta dalla mano nella run della classe GestionePartita");
                         }
+                        primaMano = false;
                     }
                 }
             }
         }
+    }
+
+    public void SetNomiGiocatori(String nome1, String nome2) {
+        giocatoreLocale().nome = nome1;
+        giocatoreEsterno().nome = nome2;
+        System.out.println("Ho settato nomi giocatori");
     }
 
     public void IniziaPartita(boolean sonoMazziere) {
@@ -79,20 +89,26 @@ public class GestionePartita extends Thread {
                 return;
             }
             for (int i = 0; i < 3; i++) {
-                giocatoreLocale.AggiungiCartaAllaMano(tavolo.GetCarta(true));
+                giocatoreLocale().AggiungiCartaAllaMano(tavolo.GetCarta(true));
+                System.out.println("Ho pescato");
                 while (!gestioneConnessione.flagAltroHaPescato) {
                     assert true;
                 }
+                System.out.println("Altro ha pescato");
                 gestioneConnessione.flagAltroHaPescato = false;
             }
             this.turnoMio = true;
         } else {
-            while (!gestioneConnessione.flagAltroHaMandatoMazzo) assert true;
+            while (!gestioneConnessione.flagAltroHaMandatoMazzo) {
+                assert true;
+            }
             for (int i = 0; i < 3; i++) {
                 while (!gestioneConnessione.flagAltroHaPescato) {
                     assert true;
                 }
-                giocatoreLocale.AggiungiCartaAllaMano(tavolo.GetCarta(true));
+                System.out.println("Altro ha pescato");
+                giocatoreLocale().AggiungiCartaAllaMano(tavolo.GetCarta(true));
+                System.out.println("Ho pescato");
                 gestioneConnessione.flagAltroHaPescato = false;
             }
             this.turnoMio = false;
@@ -143,5 +159,11 @@ public class GestionePartita extends Thread {
         }
     }
 
+    public Giocatore giocatoreLocale(){
+        return tavolo.GetGiocatore(true);
+    }
+    public Giocatore giocatoreEsterno(){
+        return tavolo.GetGiocatore(false);
+    }
     
 }

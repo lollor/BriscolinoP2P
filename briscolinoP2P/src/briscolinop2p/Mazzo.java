@@ -20,7 +20,7 @@ public class Mazzo {
     public Mazzo() throws SocketException {
         mazzo = new ArrayList<Carta>(0);
         for (int i = 0; i < 10; i++) {
-            mazzo.add(new Carta(i + 1, 'f'));
+            mazzo.add(new Carta(i + 1, 'b'));
         }
         for (int i = 0; i < 10; i++) {
             mazzo.add(new Carta(i + 1, 'c'));

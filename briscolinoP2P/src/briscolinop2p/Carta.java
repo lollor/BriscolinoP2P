@@ -20,8 +20,8 @@ public class Carta {
     public Carta(int num, char seme) {
         this.numero = num;
         this.seme = seme;
-        String path = num + seme + ".gif";
-        this.img = "../../img_carte/" + path;
+        String path = num + String.valueOf(seme) + ".gif";
+        this.img = "../img_carte/" + path;
         if(numero==1)
             punti=11;
         else if(numero==3)

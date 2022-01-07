@@ -34,6 +34,7 @@ public class GestioneConnessione extends Thread {
     boolean connesso;
     private int faseConnessione;
     private GestionePartita gestionePartita;
+    private String nomeMittente,mioNome;
     //0 - nessuno ha iniziato la connessione
     //1 - la connessione è stata iniziata da una delle due parti ed è arrivato/stato inviato il pacchetto "a;"
     //2 - la connessione è stata accettata 
@@ -91,7 +92,7 @@ public class GestioneConnessione extends Thread {
                 //apertura connessione
                 if (faseConnessione == 0 && !connesso) {
                     if (JOptionPane.showConfirmDialog(null, resto.split(";")[0] + " (" + address + ") ha chiesto di connettersi. Accettare?", "Richiesta", JOptionPane.YES_NO_OPTION) == 0) {
-                        String mioNome = JOptionPane.showInputDialog("Inserire nome");
+                        mioNome = JOptionPane.showInputDialog("Inserire nome");
                         nomeMittente = resto.split(";")[0].trim();
                         ipAddress = address;
                         Invia("y;" + mioNome + ";", ipAddress);
@@ -110,6 +111,7 @@ public class GestioneConnessione extends Thread {
                             //arrivato pacchetto dopo che io ho inviato "y;mioNome;"
                             faseConnessione = 2;
                             connesso = true;
+                            gestionePartita.SetNomiGiocatori(mioNome, nomeMittente);
                             gestionePartita.IniziaPartita(false);
                         } else if (!resto.equals("")) {
                             //arrivato pacchetto "y;suoNome;"
@@ -159,7 +161,7 @@ public class GestioneConnessione extends Thread {
                 throw new AssertionError();
         }
     }
-    private String nomeMittente;
+    
 
     public boolean IniziaConnessione(InetAddress address, String nome) throws SocketException {
         Invia("a;" + nome + ";", address);
@@ -205,5 +207,8 @@ public class GestioneConnessione extends Thread {
 
     public InetAddress GetAddress() {
         return ipAddress;
+    }
+    public GestionePartita GetPartita(){
+        return gestionePartita;
     }
 }

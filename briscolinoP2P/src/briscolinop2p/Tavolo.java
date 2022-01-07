@@ -25,8 +25,8 @@ public class Tavolo {
     private Carta briscola;
     private ArrayList<Carta> carteMostrate;
 
-    public Tavolo() {
-        this.mazzo = null;
+    public Tavolo() throws SocketException {
+        this.mazzo = new Mazzo();
         this.ioGiocatore = null;
         this.Sfidante = null;
         this.briscola = null;
@@ -65,14 +65,17 @@ public class Tavolo {
 
     public Giocatore GetGiocatore(boolean io) {
         if (io) {
+            if (ioGiocatore == null) ioGiocatore = new Giocatore();
             return ioGiocatore;
         } else {
+            if (Sfidante == null) Sfidante = new Giocatore();
             return Sfidante;
         }
     }
 
     public void SetMazzo(Mazzo mazzo){
         this.mazzo = mazzo;
+        System.out.println("Settato mazzo");
     }
     
     public boolean AggiungiCartaSulTavolo(Carta carta) {

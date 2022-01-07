@@ -9,6 +9,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import static java.lang.Integer.parseInt;
 import static java.lang.Thread.sleep;
@@ -24,17 +26,25 @@ import javax.swing.ImageIcon;
  * @author Lorenzo
  */
 public class JFrame extends javax.swing.JFrame {
-boolean finito=false;
-    Tavolo t;
+
+    boolean finito = false;
     GestioneConnessione gestisci;
-    volatile static Carta CartaSelezionata=null;
+    volatile static Carta CartaSelezionata = null;
+    
+    //immagini
+    private ImageIcon vuota, back;
+
     /**
      * Creates new form JFrame
      */
-    public JFrame() throws SocketException {
+    public JFrame() throws SocketException, FileNotFoundException, IOException {
         initComponents();
         gestisci = GestioneConnessione.getInstance();
         gestisci.start();
+        mostraCarteSulTavolo();
+        
+        vuota = new ImageIcon(ImageIO.read(new FileInputStream("../img_carte/vuota.gif")));
+        back = new ImageIcon(ImageIO.read(new FileInputStream("../img_carte/back.gif")));
     }
 
     @Override
@@ -67,112 +77,111 @@ boolean finito=false;
     }
 
     public void grafica(Graphics g) throws SocketException, IOException, InterruptedException {
-        
-        t = Tavolo.getTavolo();
+        Tavolo t = gestisci.GetPartita().tavolo;
         if (!t.GetMazzo().vuoto()) {
             //se il mazzo non e vuoto stampo la carta mazzo
-            mazzo2.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/back.gif"))));
+            mazzo2.setIcon(back);
         } else {
-            mazzo2.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/vuota.gif"))));
+            mazzo2.setIcon(vuota);
         }
-     
-            stampaManoSotto(t.GetGiocatore(true).mano);
-            stampaManoSopra(t.GetGiocatore(false).mano);
-       
+
+        stampaManoSotto(t.GetGiocatore(true).mano);
+        stampaManoSopra(t.GetGiocatore(false).mano);
         stampaMazzo(t.GetCarteMostrate());
     }
 
     public void stampaMazzo(ArrayList<Carta> m) throws IOException {
         if (m.size() == 0) {
-            mazzo1.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/vuota.gif"))));
-            mazzo2.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/vuota.gif"))));
+            mazzo1.setIcon(vuota);
+            mazzo2.setIcon(vuota);
         }
-         if (m.size() == 1) {
-            mazzo1.setIcon(new ImageIcon(ImageIO.read(new File(m.get(0).img))));
-            mazzo2.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/vuota.gif"))));
+        if (m.size() == 1) {
+            mazzo1.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(0).img))));
+            mazzo2.setIcon(vuota);
         }
-          if (m.size() == 2) {
-            mazzo1.setIcon(new ImageIcon(ImageIO.read(new File(m.get(0).img))));
-            mazzo2.setIcon(new ImageIcon(ImageIO.read(new File(m.get(1).img))));
+        if (m.size() == 2) {
+            mazzo1.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(0).img))));
+            mazzo2.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(1).img))));
         }
     }
 
     public void stampaManoSotto(ArrayList<Carta> m) throws IOException, InterruptedException {
-        if (m.size() == 3) {
-            m1.setIcon(new ImageIcon(ImageIO.read(new File(m.get(0).img))));
-            m2.setIcon(new ImageIcon(ImageIO.read(new File(m.get(1).img))));
-             sleep(500);
-            m3.setIcon(new ImageIcon(ImageIO.read(new File(m.get(2).img))));
+        if (m.size() == 3) { 
+            System.out.println(m.get(0).img);
+            m1.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(0).img))));
+            m2.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(1).img))));
+            sleep(500);
+            m3.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(2).img))));
         } else if (m.size() == 2) {
-            m1.setIcon(new ImageIcon(ImageIO.read(new File(m.get(0).img))));
-             sleep(500);
-            m2.setIcon(new ImageIcon(ImageIO.read(new File(m.get(1).img))));
-            m3.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/vuota.gif"))));
+            m1.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(0).img))));
+            sleep(500);
+            m2.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(1).img))));
+            m3.setIcon(vuota);
         } else if (m.size() == 1) {
             sleep(500);
-            m1.setIcon(new ImageIcon(ImageIO.read(new File(m.get(0).img))));
-            m2.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/vuota.gif"))));
-            m3.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/vuota.gif"))));
+            m1.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(0).img))));
+            m2.setIcon(vuota);
+            m3.setIcon(vuota);
         } else {
-            m1.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/vuota.gif"))));
-            m2.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/vuota.gif"))));
-            m3.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/vuota.gif"))));
+            m1.setIcon(vuota);
+            m2.setIcon(vuota);
+            m3.setIcon(vuota);
         }
     }
 
     public void stampaManoSopra(ArrayList<Carta> m) throws IOException, InterruptedException {
-      if (m.size() == 3) {
-            av1.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/back.gif"))));
-            av2.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/back.gif"))));
+        if (m.size() == 3) {
+            av1.setIcon(back);
+            av2.setIcon(back);
             sleep(500);
-            av3.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/back.gif"))));
+            av3.setIcon(back);
         } else if (m.size() == 2) {
-            av1.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/back.gif"))));
+            av1.setIcon(back);
             sleep(500);
-            av2.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/back.gif"))));
-            av3.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/vuota.gif"))));
+            av2.setIcon(back);
+            av3.setIcon(vuota);
         } else if (m.size() == 1) {
             sleep(500);
-            av1.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/back.gif"))));
-            av2.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/vuota.gif"))));
-            av3.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/vuota.gif"))));
+            av1.setIcon(back);
+            av2.setIcon(vuota);
+            av3.setIcon(vuota);
         } else {
-            av1.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/vuota.gif"))));
-            av2.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/vuota.gif"))));
-            av3.setIcon(new ImageIcon(ImageIO.read(new File("../../img_carte/vuota.gif"))));
+            av1.setIcon(vuota);
+            av2.setIcon(vuota);
+            av3.setIcon(vuota);
         }
-           
-        
+
     }
-    
-    public void partitaFinita(){
-        finito=true;
+
+    public void partitaFinita() {
+        Tavolo t = gestisci.GetPartita().tavolo;
+        finito = true;
         //il giocatore sfidante sta sempre sopra mentre tu sempre sotto
         punteggioSopra.setText(t.GetGiocatore(false).punteggio);
         punteggioSotto.setText(t.GetGiocatore(true).punteggio);
-        
-       if(parseInt(t.GetGiocatore(true).punteggio)>parseInt(t.GetGiocatore(false).punteggio)){
-           InfoIo.setText("hai vinto");
-           InfoSfidante.setText("hai perso");
-       }else if(parseInt(t.GetGiocatore(true).punteggio)==parseInt(t.GetGiocatore(false).punteggio)){
-           InfoIo.setText("pareggio");
-           InfoSfidante.setText("pareggio");
-       }else{
-           InfoIo.setText("hai perso");
-           InfoSfidante.setText("hai vinto");
-       }
+
+        if (parseInt(t.GetGiocatore(true).punteggio) > parseInt(t.GetGiocatore(false).punteggio)) {
+            InfoIo.setText("hai vinto");
+            InfoSfidante.setText("hai perso");
+        } else if (parseInt(t.GetGiocatore(true).punteggio) == parseInt(t.GetGiocatore(false).punteggio)) {
+            InfoIo.setText("pareggio");
+            InfoSfidante.setText("pareggio");
+        } else {
+            InfoIo.setText("hai perso");
+            InfoSfidante.setText("hai vinto");
+        }
     }
-    
+
     //PER MOSTRARE LE CARTE SUL TAVOLO TI CONSIGLIO DI FARE UN THREAD CHE IN CONTINUAZIONE PRENDE L'ARRAY 
     //DI CARTE DAL TAVOLO E LO MOSTRA
     //TI FACCIO LA FUNZIONE POI TU SAI QUELLO CHE C'E DA METTERE DENTRO
-    public void mostraCarteSulTavolo(){
+    public void mostraCarteSulTavolo() {
         new Thread(() -> {
-            while (finito==false){
+            while (finito == false) {
                 //mostra tutte le carte del tavolo
                 repaint();
                 try {
-                    Thread.sleep(300);
+                    Thread.sleep(500);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(JFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -273,12 +282,11 @@ boolean finito=false;
                                         .addGap(57, 57, 57))
                                     .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addGap(57, 57, 57)))
                             .addComponent(InfoIo, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(1, 1, 1)))
-                .addGap(javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -356,6 +364,8 @@ boolean finito=false;
                 try {
                     new JFrame().setVisible(true);
                 } catch (SocketException ex) {
+                    Logger.getLogger(JFrame.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
                     Logger.getLogger(JFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }

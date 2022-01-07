@@ -17,8 +17,8 @@ public class Giocatore {
     String punteggio;
     ArrayList<Carta> mano;//tre carte che ha in mano il giocatore
 
-    public Giocatore(String nome) {
-        this.nome = nome;
+    public Giocatore() {
+        this.nome = "";
         punteggio = "";
         mano = new ArrayList<Carta>(0);
     }
