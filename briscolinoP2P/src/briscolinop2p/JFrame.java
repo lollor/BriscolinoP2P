@@ -35,7 +35,7 @@ public class JFrame extends javax.swing.JFrame{
     final int xAv2 = 491, xAv1 = 370, xAv3 = 610, yAv = 40;
     final int xMazzo1 = 431, xMazzo2 = 558, yMazzo = 228;
     final int xM1 = 491, xM2 = 617, xM3 = 363, yM = 414;
-
+    final int xMazzo = 125;
     boolean finito = false;
     GestioneConnessione gestisci;
     volatile static Carta CartaSelezionata = null;
@@ -99,24 +99,19 @@ public class JFrame extends javax.swing.JFrame{
         Tavolo t = gestisci.GetPartita().tavolo;
         if (!t.GetMazzo().vuoto()) {
             //se il mazzo non e vuoto stampo la carta mazzo
-            //mazzo2.setIcon(new ImageIcon(back));
             g.drawImage(back, xMazzo2, yMazzo, WIDTH, HEIGHT, null);
         } else {
-            //mazzo2.setIcon(new ImageIcon(vuota));
             g.drawImage(vuota, xMazzo2, yMazzo, WIDTH, HEIGHT, null);
         }
         stampaManoSotto(t.GetGiocatore(true).mano, g);
         stampaManoSopra(t.GetGiocatore(false).mano, g);
         stampaMazzo(t.GetCarteMostrate(), g);
-        //sistemaPulsanti();
     }
 
     public void stampaMazzo(ArrayList<Carta> m, Graphics g) throws IOException {
         if (m.size() == 0) {
             g.drawImage(vuota, xMazzo1, yMazzo, WIDTH, HEIGHT, null);
             g.drawImage(vuota, xMazzo2, yMazzo, WIDTH, HEIGHT, null);
-            //mazzo1.setIcon(new ImageIcon(vuota));
-            //mazzo2.setIcon(new ImageIcon(vuota));
         }
         if (m.size() == 1) {
             g.drawImage(ImageIO.read(new FileInputStream(m.get(0).img)), xMazzo1, yMazzo, WIDTH, HEIGHT, null);
@@ -126,40 +121,33 @@ public class JFrame extends javax.swing.JFrame{
             g.drawImage(ImageIO.read(new FileInputStream(m.get(0).img)), xMazzo1, yMazzo, WIDTH, HEIGHT, null);
             g.drawImage(ImageIO.read(new FileInputStream(m.get(1).img)), xMazzo2, yMazzo, WIDTH, HEIGHT, null);
         }
+        
+        if (Tavolo.getTavolo().GetMazzo().vuoto()){
+            g.drawImage(vuota, xMazzo, yMazzo, WIDTH, HEIGHT, null);
+        } else 
+            g.drawImage(back, xMazzo, yMazzo, WIDTH, HEIGHT, null);
     }
 
     public void stampaManoSotto(ArrayList<Carta> m, Graphics g) throws IOException, InterruptedException {
         if (m.size() == 3) {
             g.drawImage(ImageIO.read(new FileInputStream(m.get(0).img)), xM1, yM, WIDTH, HEIGHT, null);
-            //m1.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(0).img))));
             g.drawImage(ImageIO.read(new FileInputStream(m.get(1).img)), xM2, yM, WIDTH, HEIGHT, null);
-            //m2.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(1).img))));
             sleep(500);
             g.drawImage(ImageIO.read(new FileInputStream(m.get(2).img)), xM3, yM, WIDTH, HEIGHT, null);
-            //m3.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(2).img))));
         } else if (m.size() == 2) {
             g.drawImage(ImageIO.read(new FileInputStream(m.get(0).img)), xM1, yM, WIDTH, HEIGHT, null);
-            //m1.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(0).img))));
             sleep(500);
             g.drawImage(ImageIO.read(new FileInputStream(m.get(1).img)), xM2, yM, WIDTH, HEIGHT, null);
-            //m2.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(1).img))));
             g.drawImage(vuota, xM3, yM, WIDTH, HEIGHT, null);
-            //m3.setIcon(new ImageIcon(vuota));
         } else if (m.size() == 1) {
             sleep(500);
             g.drawImage(ImageIO.read(new FileInputStream(m.get(0).img)), xM1, yM, WIDTH, HEIGHT, null);
-            //m1.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(0).img))));
             g.drawImage(vuota, xM2, yM, WIDTH, HEIGHT, null);
-            //m2.setIcon(new ImageIcon(vuota));
             g.drawImage(vuota, xM3, yM, WIDTH, HEIGHT, null);
-            //m3.setIcon(new ImageIcon(vuota));
         } else {
             g.drawImage(vuota, xM1, yM, WIDTH, HEIGHT, null);
-            //m1.setIcon(new ImageIcon(vuota));
             g.drawImage(vuota, xM2, yM, WIDTH, HEIGHT, null);
-            //m2.setIcon(new ImageIcon(vuota));
             g.drawImage(vuota, xM3, yM, WIDTH, HEIGHT, null);
-            //m3.setIcon(new ImageIcon(vuota));
         }
     }
 
@@ -167,34 +155,22 @@ public class JFrame extends javax.swing.JFrame{
         if (m.size() == 3) {
             g.drawImage(back, xAv2, yAv, WIDTH, HEIGHT, null);
             g.drawImage(back, xAv1, yAv, WIDTH, HEIGHT, null);
-            //av1.setIcon(new ImageIcon(back));
-            //av2.setIcon(new ImageIcon(back));
-            sleep(500);
-            //av3.setIcon(new ImageIcon(back));
+            //sleep(500);
             g.drawImage(back, xAv3, yAv, WIDTH, HEIGHT, null);
         } else if (m.size() == 2) {
-            //av1.setIcon(new ImageIcon(back));
             g.drawImage(back, xAv1, yAv, WIDTH, HEIGHT, null);
-            sleep(500);
+            //sleep(500);
             g.drawImage(back, xAv2, yAv, WIDTH, HEIGHT, null);
-            //av2.setIcon(new ImageIcon(back));
             g.drawImage(vuota, xAv3, yAv, WIDTH, HEIGHT, null);
-            //av3.setIcon(new ImageIcon(vuota));
         } else if (m.size() == 1) {
-            sleep(500);
-            //av1.setIcon(new ImageIcon(back));
+            //sleep(500);
             g.drawImage(back, xAv1, yAv, WIDTH, HEIGHT, null);
             g.drawImage(vuota, xAv2, yAv, WIDTH, HEIGHT, null);
             g.drawImage(vuota, xAv3, yAv, WIDTH, HEIGHT, null);
-            //av2.setIcon(new ImageIcon(vuota));
-            //av3.setIcon(new ImageIcon(vuota));
         } else {
             g.drawImage(vuota, xAv1, yAv, WIDTH, HEIGHT, null);
             g.drawImage(vuota, xAv2, yAv, WIDTH, HEIGHT, null);
             g.drawImage(vuota, xAv3, yAv, WIDTH, HEIGHT, null);
-            //av1.setIcon(new ImageIcon(vuota));
-            //av2.setIcon(new ImageIcon(vuota));
-            //av3.setIcon(new ImageIcon(vuota));
         }
 
     }
