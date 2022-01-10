@@ -5,9 +5,11 @@
  */
 package briscolinop2p;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,12 +29,17 @@ import javax.swing.ImageIcon;
  */
 public class JFrame extends javax.swing.JFrame {
 
+    final int WIDTH = 100, HEIGHT = 147;
+    final int xAv2 = 491, xAv1 = 370, xAv3 = 610, yAv = 40;
+    final int xMazzo1 = 431, xMazzo2 = 558, yMazzo = 228;
+    final int xM1 = 491, xM2 = 617, xM3 = 363, yM = 414;
+
     boolean finito = false;
     GestioneConnessione gestisci;
     volatile static Carta CartaSelezionata = null;
-    
+
     //immagini
-    private ImageIcon vuota, back;
+    private BufferedImage vuota, back;
 
     /**
      * Creates new form JFrame
@@ -42,9 +49,10 @@ public class JFrame extends javax.swing.JFrame {
         gestisci = GestioneConnessione.getInstance();
         gestisci.start();
         mostraCarteSulTavolo();
-        
-        vuota = new ImageIcon(ImageIO.read(new FileInputStream("../img_carte/vuota.gif")));
-        back = new ImageIcon(ImageIO.read(new FileInputStream("../img_carte/back.gif")));
+        vuota = ImageIO.read(new FileInputStream("../img_carte/vuota.gif"));
+        back = ImageIO.read(new FileInputStream("../img_carte/back.gif"));
+
+        sistemaPulsanti();
     }
 
     @Override
@@ -52,7 +60,6 @@ public class JFrame extends javax.swing.JFrame {
         Graphics offgc;
         Image offscreen = null;
         Dimension d = getSize();
-
         // create the offscreen buffer and associated Graphics
         offscreen = createImage(d.width, d.height);
         offgc = offscreen.getGraphics();
@@ -60,6 +67,7 @@ public class JFrame extends javax.swing.JFrame {
         offgc.setColor(getBackground());
         offgc.fillRect(0, 0, d.width, d.height);
         offgc.setColor(getForeground());
+
         try {
             try {
                 // do normal redraw
@@ -80,75 +88,102 @@ public class JFrame extends javax.swing.JFrame {
         Tavolo t = gestisci.GetPartita().tavolo;
         if (!t.GetMazzo().vuoto()) {
             //se il mazzo non e vuoto stampo la carta mazzo
-            mazzo2.setIcon(back);
+            //mazzo2.setIcon(new ImageIcon(back));
+            g.drawImage(back, xMazzo2, yMazzo, WIDTH, HEIGHT, null);
         } else {
-            mazzo2.setIcon(vuota);
+            //mazzo2.setIcon(new ImageIcon(vuota));
+            g.drawImage(vuota, xMazzo2, yMazzo, WIDTH, HEIGHT, null);
         }
-
-        stampaManoSotto(t.GetGiocatore(true).mano);
-        stampaManoSopra(t.GetGiocatore(false).mano);
-        stampaMazzo(t.GetCarteMostrate());
+        stampaManoSotto(t.GetGiocatore(true).mano, g);
+        stampaManoSopra(t.GetGiocatore(false).mano, g);
+        stampaMazzo(t.GetCarteMostrate(), g);
+        //sistemaPulsanti();
     }
 
-    public void stampaMazzo(ArrayList<Carta> m) throws IOException {
+    public void stampaMazzo(ArrayList<Carta> m, Graphics g) throws IOException {
         if (m.size() == 0) {
-            mazzo1.setIcon(vuota);
-            mazzo2.setIcon(vuota);
+            g.drawImage(vuota, xMazzo1, yMazzo, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xMazzo2, yMazzo, WIDTH, HEIGHT, null);
+            //mazzo1.setIcon(new ImageIcon(vuota));
+            //mazzo2.setIcon(new ImageIcon(vuota));
         }
         if (m.size() == 1) {
-            mazzo1.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(0).img))));
-            mazzo2.setIcon(vuota);
+            g.drawImage(ImageIO.read(new FileInputStream(m.get(0).img)), xMazzo1, yMazzo, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xMazzo2, yMazzo, WIDTH, HEIGHT, null);
         }
         if (m.size() == 2) {
-            mazzo1.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(0).img))));
-            mazzo2.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(1).img))));
+            g.drawImage(ImageIO.read(new FileInputStream(m.get(0).img)), xMazzo1, yMazzo, WIDTH, HEIGHT, null);
+            g.drawImage(ImageIO.read(new FileInputStream(m.get(1).img)), xMazzo2, yMazzo, WIDTH, HEIGHT, null);
         }
     }
 
-    public void stampaManoSotto(ArrayList<Carta> m) throws IOException, InterruptedException {
-        if (m.size() == 3) { 
-            System.out.println(m.get(0).img);
-            m1.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(0).img))));
-            m2.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(1).img))));
-            sleep(500);
-            m3.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(2).img))));
-        } else if (m.size() == 2) {
-            m1.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(0).img))));
-            sleep(500);
-            m2.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(1).img))));
-            m3.setIcon(vuota);
-        } else if (m.size() == 1) {
-            sleep(500);
-            m1.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(0).img))));
-            m2.setIcon(vuota);
-            m3.setIcon(vuota);
-        } else {
-            m1.setIcon(vuota);
-            m2.setIcon(vuota);
-            m3.setIcon(vuota);
-        }
-    }
-
-    public void stampaManoSopra(ArrayList<Carta> m) throws IOException, InterruptedException {
+    public void stampaManoSotto(ArrayList<Carta> m, Graphics g) throws IOException, InterruptedException {
         if (m.size() == 3) {
-            av1.setIcon(back);
-            av2.setIcon(back);
+            g.drawImage(ImageIO.read(new FileInputStream(m.get(0).img)), xM1, yM, WIDTH, HEIGHT, null);
+            //m1.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(0).img))));
+            g.drawImage(ImageIO.read(new FileInputStream(m.get(1).img)), xM2, yM, WIDTH, HEIGHT, null);
+            //m2.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(1).img))));
             sleep(500);
-            av3.setIcon(back);
+            g.drawImage(ImageIO.read(new FileInputStream(m.get(2).img)), xM3, yM, WIDTH, HEIGHT, null);
+            //m3.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(2).img))));
         } else if (m.size() == 2) {
-            av1.setIcon(back);
+            g.drawImage(ImageIO.read(new FileInputStream(m.get(0).img)), xM1, yM, WIDTH, HEIGHT, null);
+            //m1.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(0).img))));
             sleep(500);
-            av2.setIcon(back);
-            av3.setIcon(vuota);
+            g.drawImage(ImageIO.read(new FileInputStream(m.get(1).img)), xM2, yM, WIDTH, HEIGHT, null);
+            //m2.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(1).img))));
+            g.drawImage(vuota, xM3, yM, WIDTH, HEIGHT, null);
+            //m3.setIcon(new ImageIcon(vuota));
         } else if (m.size() == 1) {
             sleep(500);
-            av1.setIcon(back);
-            av2.setIcon(vuota);
-            av3.setIcon(vuota);
+            g.drawImage(ImageIO.read(new FileInputStream(m.get(0).img)), xM1, yM, WIDTH, HEIGHT, null);
+            //m1.setIcon(new ImageIcon(ImageIO.read(new FileInputStream(m.get(0).img))));
+            g.drawImage(vuota, xM2, yM, WIDTH, HEIGHT, null);
+            //m2.setIcon(new ImageIcon(vuota));
+            g.drawImage(vuota, xM3, yM, WIDTH, HEIGHT, null);
+            //m3.setIcon(new ImageIcon(vuota));
         } else {
-            av1.setIcon(vuota);
-            av2.setIcon(vuota);
-            av3.setIcon(vuota);
+            g.drawImage(vuota, xM1, yM, WIDTH, HEIGHT, null);
+            //m1.setIcon(new ImageIcon(vuota));
+            g.drawImage(vuota, xM2, yM, WIDTH, HEIGHT, null);
+            //m2.setIcon(new ImageIcon(vuota));
+            g.drawImage(vuota, xM3, yM, WIDTH, HEIGHT, null);
+            //m3.setIcon(new ImageIcon(vuota));
+        }
+    }
+
+    public void stampaManoSopra(ArrayList<Carta> m, Graphics g) throws IOException, InterruptedException {
+        if (m.size() == 3) {
+            g.drawImage(back, xAv2, yAv, WIDTH, HEIGHT, null);
+            g.drawImage(back, xAv1, yAv, WIDTH, HEIGHT, null);
+            //av1.setIcon(new ImageIcon(back));
+            //av2.setIcon(new ImageIcon(back));
+            sleep(500);
+            //av3.setIcon(new ImageIcon(back));
+            g.drawImage(back, xAv3, yAv, WIDTH, HEIGHT, null);
+        } else if (m.size() == 2) {
+            //av1.setIcon(new ImageIcon(back));
+            g.drawImage(back, xAv1, yAv, WIDTH, HEIGHT, null);
+            sleep(500);
+            g.drawImage(back, xAv2, yAv, WIDTH, HEIGHT, null);
+            //av2.setIcon(new ImageIcon(back));
+            g.drawImage(vuota, xAv3, yAv, WIDTH, HEIGHT, null);
+            //av3.setIcon(new ImageIcon(vuota));
+        } else if (m.size() == 1) {
+            sleep(500);
+            //av1.setIcon(new ImageIcon(back));
+            g.drawImage(back, xAv1, yAv, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xAv2, yAv, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xAv3, yAv, WIDTH, HEIGHT, null);
+            //av2.setIcon(new ImageIcon(vuota));
+            //av3.setIcon(new ImageIcon(vuota));
+        } else {
+            g.drawImage(vuota, xAv1, yAv, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xAv2, yAv, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xAv3, yAv, WIDTH, HEIGHT, null);
+            //av1.setIcon(new ImageIcon(vuota));
+            //av2.setIcon(new ImageIcon(vuota));
+            //av3.setIcon(new ImageIcon(vuota));
         }
 
     }
@@ -172,6 +207,15 @@ public class JFrame extends javax.swing.JFrame {
         }
     }
 
+    private void sistemaPulsanti() {
+        jButton1.setForeground(new Color(0, 0, 0, 0));
+        //jButton1.setBackground(new Color(0,0,0,0));
+        jButton1.setOpaque(false);
+        jButton1.setBorderPainted(false);
+        jButton1.setFocusPainted(false);
+
+    }
+
     //PER MOSTRARE LE CARTE SUL TAVOLO TI CONSIGLIO DI FARE UN THREAD CHE IN CONTINUAZIONE PRENDE L'ARRAY 
     //DI CARTE DAL TAVOLO E LO MOSTRA
     //TI FACCIO LA FUNZIONE POI TU SAI QUELLO CHE C'E DA METTERE DENTRO
@@ -181,11 +225,12 @@ public class JFrame extends javax.swing.JFrame {
                 //mostra tutte le carte del tavolo
                 repaint();
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(200);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(JFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+            repaint();
         }).start();
     }
 
@@ -201,8 +246,6 @@ public class JFrame extends javax.swing.JFrame {
         av1 = new javax.swing.JLabel();
         av2 = new javax.swing.JLabel();
         av3 = new javax.swing.JLabel();
-        m1 = new javax.swing.JLabel();
-        m2 = new javax.swing.JLabel();
         m3 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         punteggioSotto = new javax.swing.JTextArea();
@@ -214,6 +257,7 @@ public class JFrame extends javax.swing.JFrame {
         mazzo1 = new javax.swing.JLabel();
         InfoIo = new javax.swing.JLabel();
         InfoSfidante = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(0, 102, 51));
@@ -225,10 +269,6 @@ public class JFrame extends javax.swing.JFrame {
         av2.setBackground(new java.awt.Color(255, 255, 255));
 
         av3.setBackground(new java.awt.Color(255, 255, 255));
-
-        m1.setBackground(new java.awt.Color(255, 255, 255));
-
-        m2.setBackground(new java.awt.Color(255, 255, 255));
 
         m3.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -244,6 +284,13 @@ public class JFrame extends javax.swing.JFrame {
 
         jLabel2.setText("------------------------------");
 
+        jButton1.setText("jButton1");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -251,25 +298,29 @@ public class JFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(125, 125, 125)
                 .addComponent(mazzo, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 138, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(mazzo1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(27, 27, 27)
-                        .addComponent(mazzo2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(59, 59, 59))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(m3, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(28, 28, 28)
-                        .addComponent(m1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(26, 26, 26)
-                        .addComponent(m2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(av3, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(28, 28, 28)
                         .addComponent(av1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(26, 26, 26)
-                        .addComponent(av2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(av2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(mazzo1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(94, 94, 94))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(m3, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(279, 279, 279)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(mazzo2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(59, 59, 59))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(17, 17, 17)))))
                 .addGap(74, 74, 74)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(InfoSfidante, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -310,26 +361,33 @@ public class JFrame extends javax.swing.JFrame {
                                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(116, 116, 116)))
                         .addComponent(InfoIo, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(83, 83, 83))
-                    .addGroup(layout.createSequentialGroup()
+                        .addGap(103, 103, 103))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(av3, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(av1, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(av2, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(35, 35, 35)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(mazzo1, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(mazzo2, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 79, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(m3, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(m1, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(m2, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(20, 20, 20))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(av3, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(av1, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(av2, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(35, 35, 35)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(mazzo1, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(mazzo2, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 47, Short.MAX_VALUE)
+                                .addComponent(m3, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(52, 52, 52))))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        System.out.println("Premuto jButton1");
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -378,11 +436,10 @@ public class JFrame extends javax.swing.JFrame {
     private javax.swing.JLabel av1;
     private javax.swing.JLabel av2;
     private javax.swing.JLabel av3;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JLabel m1;
-    private javax.swing.JLabel m2;
     private javax.swing.JLabel m3;
     private javax.swing.JLabel mazzo;
     private javax.swing.JLabel mazzo1;
@@ -390,4 +447,5 @@ public class JFrame extends javax.swing.JFrame {
     private javax.swing.JTextArea punteggioSopra;
     private javax.swing.JTextArea punteggioSotto;
     // End of variables declaration//GEN-END:variables
+
 }

@@ -34,16 +34,15 @@ public class Mazzo {
         this.gestionePartita = GestionePartita.getInstance();
     }
 
-    public static Mazzo CreaMazzo(String[] vettoreCarte) throws SocketException {
-        Mazzo mazzo = new Mazzo();
+    public Mazzo(String[] vettoreCarte) throws SocketException {
+        mazzo = new ArrayList<Carta>(0);
         if (vettoreCarte.length != 40) {
             System.out.println("Il mazzo non ha 40 carte.");
-            return null;
         }
         for (String string : vettoreCarte) {
-            mazzo.mazzo.add(Carta.creaCarta(string));
+            mazzo.add(Carta.creaCarta(string));
         }
-        return mazzo;
+        this.gestionePartita = GestionePartita.getInstance();
     }
 
     public ArrayList<Carta> GetMazzo() {

@@ -136,7 +136,7 @@ public class GestioneConnessione extends Thread {
                 break;
             case 'm':
                 //salva mazzo
-                gestionePartita.tavolo.SetMazzo(Mazzo.CreaMazzo(resto.split(";")));
+                gestionePartita.tavolo.SetMazzo(new Mazzo(resto.split(";")));
                 Invia("m;y;", address);
                 flagAltroHaMandatoMazzo = true;
                 break;
@@ -151,7 +151,8 @@ public class GestioneConnessione extends Thread {
                 }
                 break;
             case 'p':
-                gestionePartita.tavolo.GetCarta(false);
+                Carta c = gestionePartita.tavolo.GetCarta(false);
+                gestionePartita.giocatoreEsterno().AggiungiCartaAllaMano(c);
                 flagAltroHaPescato = true;
                 break;
             case 'f':
