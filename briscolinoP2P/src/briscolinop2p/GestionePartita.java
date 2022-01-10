@@ -82,7 +82,8 @@ public class GestionePartita extends Thread {
         System.out.println("Ho settato nomi giocatori");
     }
 
-    public void IniziaPartita(boolean sonoMazziere) {
+    public void IniziaPartita(boolean sonoMazziere) throws InterruptedException {
+        System.out.println("Iniziata partita. Sono mazziere = "+sonoMazziere);
         this.sonoMazziere = sonoMazziere;
         if (sonoMazziere) {
             if (!InviaMazzo()) {
@@ -90,7 +91,7 @@ public class GestionePartita extends Thread {
             }
             for (int i = 0; i < 3; i++) {
                 giocatoreLocale().AggiungiCartaAllaMano(tavolo.GetCarta(true));
-                System.out.println("Ho pescato");
+                System.out.println("Ho pescato e aspetto che pesca lui");
                 while (!gestioneConnessione.flagAltroHaPescato) {
                     assert true;
                 }
@@ -102,7 +103,10 @@ public class GestionePartita extends Thread {
             while (!gestioneConnessione.flagAltroHaMandatoMazzo) {
                 assert true;
             }
+            System.out.println("Altro ha mandato ha mandato mazzo");
             for (int i = 0; i < 3; i++) {
+                sleep(100);
+                System.out.println("Aspetto che pesca lui e poi pesco io");
                 while (!gestioneConnessione.flagAltroHaPescato) {
                     assert true;
                 }

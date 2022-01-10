@@ -26,15 +26,15 @@ public class GestioneConnessione extends Thread {
 
     private final int THISPORT = 12345;
     private final int OTHERPORT = 12345;
-    
+
     private static GestioneConnessione istanza = null;
     private DatagramSocket socketRicezione;
     private DatagramSocket socketInvio;
     private InetAddress ipAddress;
     boolean connesso;
-    private int faseConnessione;
+    private volatile int faseConnessione;
     private GestionePartita gestionePartita;
-    private String nomeMittente,mioNome;
+    private String nomeMittente, mioNome;
     //0 - nessuno ha iniziato la connessione
     //1 - la connessione è stata iniziata da una delle due parti ed è arrivato/stato inviato il pacchetto "a;"
     //2 - la connessione è stata accettata 
@@ -45,15 +45,14 @@ public class GestioneConnessione extends Thread {
     volatile Carta flagCartaButtataDallAltro = null;
     volatile boolean flagAltroHaDatoPunteggio = false;
     volatile boolean flagAltroHaMandatoMazzo = false;
-    
+
     public static synchronized GestioneConnessione getInstance() throws SocketException {
         if (istanza == null) {
             istanza = new GestioneConnessione();
         }
         return istanza;
     }
-    
-    
+
     public GestioneConnessione() throws SocketException {
         istanza = this;
         this.socketRicezione = new DatagramSocket(THISPORT);
@@ -78,12 +77,16 @@ public class GestioneConnessione extends Thread {
                     gestisciPaccketto(new String(p.getData()).trim(), p.getAddress());
                 } catch (SocketException ex) {
                     Logger.getLogger(GestioneConnessione.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(GestioneConnessione.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(GestioneConnessione.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }).start();
         }
     }
 
-    private void gestisciPaccketto(String data, InetAddress address) throws SocketException {
+    private void gestisciPaccketto(String data, InetAddress address) throws SocketException, IOException, InterruptedException {
         System.out.println("IN [" + data + "] [" + address + "]");
         char tipoRichiesta = data.charAt(0);
         String resto = data.substring(data.indexOf(";") + 1);
@@ -106,22 +109,29 @@ public class GestioneConnessione extends Thread {
                 break;
             case 'y':
                 if (faseConnessione == 1 && !connesso) {
-                    if (address.equals(ipAddress)) {
-                        if (resto.equals("")) {
-                            //arrivato pacchetto dopo che io ho inviato "y;mioNome;"
-                            faseConnessione = 2;
-                            connesso = true;
-                            gestionePartita.SetNomiGiocatori(mioNome, nomeMittente);
-                            gestionePartita.IniziaPartita(false);
-                        } else if (!resto.equals("")) {
-                            //arrivato pacchetto "y;suoNome;"
-                            nomeMittente = resto.split(";")[0].trim();
-                            faseConnessione = 2;
-                        }
-                        //impostare nome giocatore
-                    } else {
+                    if (resto.equals("")) {
+                        //arrivato pacchetto "y;" dopo che io ho inviato "y;mioNome;"
+                        faseConnessione = 2;
+                        //System.out.println("Ho cambiato fase connessione a 2");
+                        ipAddress = address;
+                        connesso = true;
+                        gestionePartita.SetNomiGiocatori(mioNome, nomeMittente);
+                        JFrame f = new JFrame();
+                        Connessione.GetInstance().setVisible(false);
+                        f.start(null);
+                        //gestionePartita.IniziaPartita(true);
+                    } else if (!resto.equals("")) {
+                        //arrivato pacchetto "y;suoNome;"
+                        ipAddress = address;
+                        nomeMittente = resto.split(";")[0].trim();
+                        faseConnessione = 2;
+                        gestionePartita.SetNomiGiocatori(mioNome, nomeMittente);
+                    } //impostare nome giocatore
+                    else {
                         //è arrivato un pacchetto y; da un client diverso
                         //rimane uguale e questo server aspetta comunque il pacchetto y; dal client precedente
+                        //gestionePartita.SetNomiGiocatori(mioNome, nomeMittente);
+                        //gestionePartita.IniziaPartita(false);
                     }
                 }
                 break;
@@ -136,14 +146,20 @@ public class GestioneConnessione extends Thread {
                 break;
             case 'm':
                 //salva mazzo
-                gestionePartita.tavolo.SetMazzo(new Mazzo(resto.split(";")));
-                Invia("m;y;", address);
-                flagAltroHaMandatoMazzo = true;
+                if (resto.split(";")[0].equals("y")) {
+                    flagMazzoArrivato = true;
+                    //gestionePartita.IniziaPartita(true);
+                } else {
+                    gestionePartita.tavolo.SetMazzo(new Mazzo(resto.split(";")));
+                    Invia("m;y;", address);
+                    flagAltroHaMandatoMazzo = true;
+                    gestionePartita.IniziaPartita(false);
+                }
                 break;
             case 'b':
                 Carta carta = Carta.creaCarta(resto.split(";")[0].trim());
-                if (gestionePartita.tavolo.AggiungiCartaSulTavolo(carta)){
-                    if (!gestionePartita.turnoMio){
+                if (gestionePartita.tavolo.AggiungiCartaSulTavolo(carta)) {
+                    if (!gestionePartita.turnoMio) {
                         Invia(gestionePartita.tavolo.CalcoloChiHaVintoMano(), address);
                     }
                 } else {
@@ -162,7 +178,6 @@ public class GestioneConnessione extends Thread {
                 throw new AssertionError();
         }
     }
-    
 
     public boolean IniziaConnessione(InetAddress address, String nome) throws SocketException {
         Invia("a;" + nome + ";", address);
@@ -170,6 +185,9 @@ public class GestioneConnessione extends Thread {
         //timer di attesa della risposta, 20 secondi
         long time = System.currentTimeMillis();
         while (faseConnessione == 1) {
+            if (faseConnessione == 2) {
+                break;
+            }
             if ((System.currentTimeMillis() - time) > 20000 && !connesso && faseConnessione == 1) {
                 connesso = false;
                 faseConnessione = 0;
@@ -183,14 +201,20 @@ public class GestioneConnessione extends Thread {
             // NON TOCCARE
         }
         //se arriva il messaggio ma ho gia creato una connessione la rifiuto e ritorno false
-        if (faseConnessione != 2 || connesso) {
+        if (faseConnessione != 2) {
             return false;
         }
         Invia("y;", address);
+        ipAddress = address;
         connesso = true;
-        gestionePartita.IniziaPartita(true);
-        
         Util.ShowDialog("Sono connesso a " + nomeMittente, "Connessione effettuata.");
+        new Thread(() -> {
+            try {
+                gestionePartita.IniziaPartita(true);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(GestioneConnessione.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }).start();
         return true;
     }
 
@@ -209,7 +233,8 @@ public class GestioneConnessione extends Thread {
     public InetAddress GetAddress() {
         return ipAddress;
     }
-    public GestionePartita GetPartita(){
+
+    public GestionePartita GetPartita() {
         return gestionePartita;
     }
 }

@@ -29,8 +29,21 @@ public class Connessione extends javax.swing.JFrame {
         initComponents();
         g = GestioneConnessione.getInstance();
         g.start();
+        instance = this;
     }
 
+    private Connessione(boolean var){
+        initComponents();
+        instance = this;
+    }
+    
+    private static Connessione instance = null;
+    static public Connessione GetInstance() throws SocketException{
+        if (instance == null){
+            instance = new Connessione(false);
+        }
+        return instance;
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -109,9 +122,8 @@ public class Connessione extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try {
             // TODO add your handling code here:
-            if(!g.IniziaConnessione(InetAddress.getByName(ip.getText()), nome.getText()))
-            {
-              return;  
+            if (!g.IniziaConnessione(InetAddress.getByName(ip.getText()), nome.getText())) {
+                return;
             }
         } catch (UnknownHostException ex) {
             Logger.getLogger(Connessione.class.getName()).log(Level.SEVERE, null, ex);
@@ -128,10 +140,8 @@ public class Connessione extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(Connessione.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    
     /**
      * @param args the command line arguments
      */
