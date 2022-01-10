@@ -25,7 +25,7 @@ import jdk.jshell.spi.ExecutionControl;
 public class GestioneConnessione extends Thread {
 
     private final int THISPORT = 12345;
-    private final int OTHERPORT = 12345;
+    private final int OTHERPORT = 12346;
 
     private static GestioneConnessione istanza = null;
     private DatagramSocket socketRicezione;
@@ -157,9 +157,11 @@ public class GestioneConnessione extends Thread {
                 }
                 break;
             case 'b':
+                System.out.println(resto.split(";")[0].trim());
                 Carta carta = Carta.creaCarta(resto.split(";")[0].trim());
                 if (gestionePartita.tavolo.AggiungiCartaSulTavolo(carta)) {
-                    if (!gestionePartita.turnoMio) {
+                    flagCartaButtataDallAltro = carta;
+                    if (gestionePartita.turnoMio) {
                         Invia(gestionePartita.tavolo.CalcoloChiHaVintoMano(), address);
                     }
                 } else {
@@ -173,7 +175,16 @@ public class GestioneConnessione extends Thread {
                 break;
             case 'f':
                 break;
-
+            case 'l':
+                flagAltroHaDatoPunteggio = true;
+                gestionePartita.tavolo.PulisciCarteTavolo();
+                gestionePartita.turnoMio = false;
+                break;
+            case 'w':
+                flagAltroHaDatoPunteggio = true;
+                gestionePartita.tavolo.PulisciCarteTavolo();
+                gestionePartita.turnoMio = true;
+                break;
             default:
                 throw new AssertionError();
         }

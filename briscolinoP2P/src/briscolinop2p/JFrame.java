@@ -29,13 +29,13 @@ import javax.swing.ImageIcon;
  *
  * @author Lorenzo
  */
-public class JFrame extends javax.swing.JFrame{
+public class JFrame extends javax.swing.JFrame {
 
     final int WIDTH = 100, HEIGHT = 147;
     final int xAv2 = 491, xAv1 = 370, xAv3 = 610, yAv = 40;
     final int xMazzo1 = 431, xMazzo2 = 558, yMazzo = 228;
-    final int xM1 = 491, xM2 = 617, xM3 = 363, yM = 414;
-    final int xMazzo = 125;
+    final int xM2 = 491, xM3 = 617, xM1 = 363, yM = 414;
+    final int xMazzo = 125, xBriscola = 240;
     boolean finito = false;
     GestioneConnessione gestisci;
     volatile static Carta CartaSelezionata = null;
@@ -93,7 +93,6 @@ public class JFrame extends javax.swing.JFrame{
         return false;
     }
 
-
     public void grafica(Graphics g) throws SocketException, IOException, InterruptedException {
         Tavolo t = gestisci.GetPartita().tavolo;
         if (!t.GetMazzo().vuoto()) {
@@ -120,11 +119,14 @@ public class JFrame extends javax.swing.JFrame{
             g.drawImage(ImageIO.read(new FileInputStream(m.get(0).img)), xMazzo1, yMazzo, WIDTH, HEIGHT, null);
             g.drawImage(ImageIO.read(new FileInputStream(m.get(1).img)), xMazzo2, yMazzo, WIDTH, HEIGHT, null);
         }
-        
-        if (Tavolo.getTavolo().GetMazzo().vuoto()){
+
+        if (Tavolo.getTavolo().GetMazzo().vuoto()) {
             g.drawImage(vuota, xMazzo, yMazzo, WIDTH, HEIGHT, null);
-        } else 
+            g.drawImage(vuota, xBriscola, yMazzo, WIDTH, HEIGHT, null);
+        } else {
             g.drawImage(back, xMazzo, yMazzo, WIDTH, HEIGHT, null);
+            g.drawImage(ImageIO.read(new FileInputStream(gestisci.GetPartita().tavolo.getBriscola().img)), xBriscola, yMazzo, WIDTH, HEIGHT, null);
+        }
     }
 
     public void stampaManoSotto(ArrayList<Carta> m, Graphics g) throws IOException, InterruptedException {
@@ -193,7 +195,6 @@ public class JFrame extends javax.swing.JFrame{
         }
     }
 
-
     //PER MOSTRARE LE CARTE SUL TAVOLO TI CONSIGLIO DI FARE UN THREAD CHE IN CONTINUAZIONE PRENDE L'ARRAY 
     //DI CARTE DAL TAVOLO E LO MOSTRA
     //TI FACCIO LA FUNZIONE POI TU SAI QUELLO CHE C'E DA METTERE DENTRO
@@ -231,6 +232,7 @@ public class JFrame extends javax.swing.JFrame{
         InfoSfidante = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Briscola");
         setBackground(new java.awt.Color(0, 102, 51));
         setBounds(new java.awt.Rectangle(0, 0, 5, 5));
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -306,32 +308,30 @@ public class JFrame extends javax.swing.JFrame{
         // TODO add your handling code here:
         int mx = evt.getX();
         int my = evt.getY();
-        ArrayList<Carta> mano=new ArrayList<Carta>();
-        try {
-            mano = Tavolo.getTavolo().GetGiocatore(true).mano;
-            
-        } catch (SocketException ex) {
-            Logger.getLogger(JFrame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        int lengthmano=mano.size();
-            
+        System.out.println("Click clock [x=" + mx + "][y=" + my + "]");
+        ArrayList<Carta> mano = gestisci.GetPartita().tavolo.GetGiocatore(true).mano;
+        int lengthmano = mano.size();
+
         if (mouseOver(mx, my, xM1, yM, WIDTH, HEIGHT)) {
-            if(lengthmano>=1){
-            System.out.println("carta 1");
-            CartaSelezionata=mano.get(2);
+            System.out.println("true" + lengthmano);
+            if (lengthmano >= 1) {
+                System.out.println("carta 1");
+                CartaSelezionata = mano.get(0);
             }
-        }else if(mouseOver(mx, my, xM2, yM, WIDTH, HEIGHT)){
-           if(lengthmano>=2){
-            System.out.println("carta 2");
-            CartaSelezionata=mano.get(2);
+        } else if (mouseOver(mx, my, xM2, yM, WIDTH, HEIGHT)) {
+            System.out.println("true" + lengthmano);
+            if (lengthmano >= 2) {
+                System.out.println("carta 2");
+                CartaSelezionata = mano.get(1);
             }
-        }else if(mouseOver(mx, my, xM3, yM, WIDTH, HEIGHT)){
-            if(lengthmano==3){
-            System.out.println("carta 3");
-            CartaSelezionata=mano.get(2);
+        } else if (mouseOver(mx, my, xM3, yM, WIDTH, HEIGHT)) {
+            System.out.println("true" + lengthmano);
+            if (lengthmano == 3) {
+                System.out.println("carta 3");
+                CartaSelezionata = mano.get(2);
             }
         }
-        
+
     }//GEN-LAST:event_formMousePressed
 
     /**
@@ -386,5 +386,4 @@ public class JFrame extends javax.swing.JFrame{
     private javax.swing.JTextArea punteggioSotto;
     // End of variables declaration//GEN-END:variables
 
-   
 }

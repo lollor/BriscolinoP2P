@@ -40,6 +40,10 @@ public class Tavolo {
         return istanza;
     }
 
+    public Carta getBriscola() {
+        return briscola;
+    }
+    
     public synchronized Carta GetCarta(boolean inviareMessaggio) {
         Carta carta = mazzo.TogliCarta();
         GestioneConnessione g;
@@ -75,6 +79,7 @@ public class Tavolo {
 
     public void SetMazzo(Mazzo mazzo){
         this.mazzo = mazzo;
+        briscola = mazzo.GetCarta(mazzo.GetSize() - 1);
         System.out.println("Settato mazzo");
     }
     
@@ -95,6 +100,7 @@ public class Tavolo {
 
     public String CalcoloChiHaVintoMano() {
         Carta carta0 = carteMostrate.get(0), carta1 = carteMostrate.get(1);
+        PulisciCarteTavolo();
         if (briscola.getSeme() == carta0.getSeme() && briscola.getSeme() != carta1.getSeme()) {
             return "w;";
         } else if (briscola.getSeme() != carta0.getSeme() && briscola.getSeme() == carta1.getSeme()) {
@@ -123,6 +129,8 @@ public class Tavolo {
                     return "l;";
                 }
             }
+        } else if (carta0.getSeme() != carta1.getSeme() && briscola.getSeme() != carta0.getSeme() && briscola.getSeme() != carta1.getSeme()){
+            return "w;";
         }
         return null;
     }
