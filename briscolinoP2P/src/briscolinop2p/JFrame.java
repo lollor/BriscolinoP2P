@@ -7,6 +7,7 @@ package briscolinop2p;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
@@ -36,12 +37,14 @@ public class JFrame extends javax.swing.JFrame {
     final int xMazzo1 = 431, xMazzo2 = 558, yMazzo = 228;
     final int xM2 = 491, xM3 = 617, xM1 = 363, yM = 414;
     final int xMazzo = 125, xBriscola = 240;
+    final int xMessaggio = 55, yMessaggio = 523;
     boolean finito = false;
     GestioneConnessione gestisci;
     volatile static Carta CartaSelezionata = null;
 
     //immagini
     private BufferedImage vuota, back;
+    private static JFrame instance;
 
     /**
      * Creates new form JFrame
@@ -52,8 +55,14 @@ public class JFrame extends javax.swing.JFrame {
         mostraCarteSulTavolo();
         vuota = ImageIO.read(new FileInputStream("../img_carte/vuota.gif"));
         back = ImageIO.read(new FileInputStream("../img_carte/back.gif"));
+        instance = this;
     }
 
+    
+    public static JFrame getInstance(){
+        return instance;
+    }
+    
     @Override
     public void paint(Graphics g) {
         Graphics offgc;
@@ -104,6 +113,10 @@ public class JFrame extends javax.swing.JFrame {
         stampaManoSotto(t.GetGiocatore(true).mano, g);
         stampaManoSopra(t.GetGiocatore(false).mano, g);
         stampaMazzo(t.GetCarteMostrate(), g);
+        
+        g.setFont(new Font("Arial", Font.BOLD, 48));
+        g.setColor(foregroundColor);
+        g.drawString(text, xMessaggio, yMessaggio);
     }
 
     public void stampaMazzo(ArrayList<Carta> m, Graphics g) throws IOException {
@@ -176,6 +189,13 @@ public class JFrame extends javax.swing.JFrame {
 
     }
 
+    String text=""; Color foregroundColor = Color.BLACK;
+    public void SetMessaggio(String text, Color foregroundColor){
+        System.out.println("Cambio var messaggi");
+        this.text = text;
+        this.foregroundColor = foregroundColor;
+    }
+    
     public void partitaFinita() {
         Tavolo t = gestisci.GetPartita().tavolo;
         finito = true;
@@ -286,19 +306,19 @@ public class JFrame extends javax.swing.JFrame {
                 .addComponent(InfoSfidante, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(121, 121, 121)
-                        .addComponent(mazzo, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 115, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 141, Short.MAX_VALUE)
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(116, 116, 116)))
-                .addComponent(InfoIo, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(103, 103, 103))
+                        .addGap(116, 116, 116)
+                        .addComponent(InfoIo, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(103, 103, 103))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(121, 121, 121)
+                        .addComponent(mazzo, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
         pack();
@@ -308,26 +328,19 @@ public class JFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
         int mx = evt.getX();
         int my = evt.getY();
-        System.out.println("Click clock [x=" + mx + "][y=" + my + "]");
         ArrayList<Carta> mano = gestisci.GetPartita().tavolo.GetGiocatore(true).mano;
         int lengthmano = mano.size();
 
         if (mouseOver(mx, my, xM1, yM, WIDTH, HEIGHT)) {
-            System.out.println("true" + lengthmano);
             if (lengthmano >= 1) {
-                System.out.println("carta 1");
                 CartaSelezionata = mano.get(0);
             }
         } else if (mouseOver(mx, my, xM2, yM, WIDTH, HEIGHT)) {
-            System.out.println("true" + lengthmano);
             if (lengthmano >= 2) {
-                System.out.println("carta 2");
                 CartaSelezionata = mano.get(1);
             }
         } else if (mouseOver(mx, my, xM3, yM, WIDTH, HEIGHT)) {
-            System.out.println("true" + lengthmano);
             if (lengthmano == 3) {
-                System.out.println("carta 3");
                 CartaSelezionata = mano.get(2);
             }
         }

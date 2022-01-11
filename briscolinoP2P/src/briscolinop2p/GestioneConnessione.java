@@ -6,6 +6,7 @@
 package briscolinop2p;
 
 //import static briscolinop2p.GestionePartita.istanza;
+import java.awt.Color;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -157,13 +158,11 @@ public class GestioneConnessione extends Thread {
                 }
                 break;
             case 'b':
-                System.out.println(resto.split(";")[0].trim());
                 Carta carta = Carta.creaCarta(resto.split(";")[0].trim());
                 if (gestionePartita.tavolo.AggiungiCartaSulTavolo(carta)) {
                     flagCartaButtataDallAltro = carta;
-                    if (gestionePartita.turnoMio) {
-                        Invia(gestionePartita.tavolo.CalcoloChiHaVintoMano(), address);
-                    }
+                    System.out.println("è il mio turno: "+gestionePartita.turnoMio);
+                    
                 } else {
                     System.out.println("Errore nell'aggiungere la carta sul tavolo nel case 'b' della funzione GestionePacchetto della classe GestioneConnessione");
                 }
@@ -176,11 +175,13 @@ public class GestioneConnessione extends Thread {
             case 'f':
                 break;
             case 'l':
+                JFrame.getInstance().SetMessaggio("Hai perso!", Color.red);
                 flagAltroHaDatoPunteggio = true;
                 gestionePartita.tavolo.PulisciCarteTavolo();
                 gestionePartita.turnoMio = false;
                 break;
             case 'w':
+                JFrame.getInstance().SetMessaggio("Hai vinto!", Color.green);
                 flagAltroHaDatoPunteggio = true;
                 gestionePartita.tavolo.PulisciCarteTavolo();
                 gestionePartita.turnoMio = true;

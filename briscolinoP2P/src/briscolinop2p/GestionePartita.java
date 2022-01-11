@@ -5,6 +5,7 @@
  */
 package briscolinop2p;
 
+import java.awt.Color;
 import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,26 +52,32 @@ public class GestionePartita extends Thread {
             while (!partitaFinita) {
                 if (turnoMio) {
                     if (!primaMano) {
+                        //pesco
                         giocatoreLocale().AggiungiCartaAllaMano(tavolo.GetCarta(true));
+                        //e aspetto che l'altro pesca
                         while (!gestioneConnessione.flagAltroHaPescato) {
                             assert true;
                         }
                         gestioneConnessione.flagAltroHaPescato = false;
                     }
-                    System.out.println("Inizio prima mano. Aspetto che selezioni la carta.");
+                    //prendo la carta
+                    JFrame.getInstance().SetMessaggio("E' il tuo turno", Color.BLUE);
                     while (JFrame.CartaSelezionata == null) {
                         assert true;
                     }
                     Carta cartaSelezionata = JFrame.CartaSelezionata;
                     JFrame.CartaSelezionata = null;
+                    //la tolgo dalla mano
                     if (giocatoreLocale().TogliCartaDallaMano(cartaSelezionata)) {
+                        //la aggiungo al tavolo
                         tavolo.AggiungiCartaSulTavolo(cartaSelezionata);
                         try {
+                            //invio la carta che ho selezionato
                             gestioneConnessione.Invia("b;" + cartaSelezionata + ";", gestioneConnessione.GetAddress());
                         } catch (SocketException ex) {
                             System.out.println("Errore nell'invia della run della classe GestionePartita");
                         }
-                        //mossa avversario
+                        //aspetto mossa avversario
                         while (!gestioneConnessione.flagAltroHaDatoPunteggio) {
                             assert true;
                         }
@@ -79,7 +86,6 @@ public class GestionePartita extends Thread {
                         System.out.println("Errore nel togliere la carta dalla mano nella run della classe GestionePartita");
                     }
                     primaMano = false;
-
                 } else {
                     if (!primaMano) {
                         while (!gestioneConnessione.flagAltroHaPescato) {
@@ -113,6 +119,7 @@ public class GestionePartita extends Thread {
                             System.out.println("Errore nell'invia della run della classe GestionePartita");
                         }
                     }
+                    primaMano = false;
                 }
                 //aspetto che o mando il risultato o arriva il risultato
             }
