@@ -45,13 +45,19 @@ public class GestionePartita extends Thread {
 
     boolean primaMano = true;
     //boolean hoVintoUltimaMano = false;
-
+    Carta cartaButtata;
     @Override
     public void run() {
         while (true) {
             while (!partitaFinita) {
+                tavolo.PulisciCarteTavolo();
+                if (tavolo.GetMazzo().GetSize() == 0 && giocatoreLocale().mano.isEmpty()){
+                    partitaFinita = true;
+                    JFrame.getInstance().finito = true;
+                    break;
+                }
                 if (turnoMio) {
-                    if (!primaMano) {
+                    if (!primaMano && tavolo.GetMazzo().GetSize() > 0) {
                         //pesco
                         giocatoreLocale().AggiungiCartaAllaMano(tavolo.GetCarta(true));
                         //e aspetto che l'altro pesca
@@ -67,6 +73,7 @@ public class GestionePartita extends Thread {
                     }
                     Carta cartaSelezionata = JFrame.CartaSelezionata;
                     JFrame.CartaSelezionata = null;
+                    JFrame.getInstance().SetMessaggio("", Color.WHITE);
                     //la tolgo dalla mano
                     if (giocatoreLocale().TogliCartaDallaMano(cartaSelezionata)) {
                         //la aggiungo al tavolo
@@ -78,32 +85,38 @@ public class GestionePartita extends Thread {
                             System.out.println("Errore nell'invia della run della classe GestionePartita");
                         }
                         //aspetto mossa avversario
-                        while (!gestioneConnessione.flagAltroHaDatoPunteggio) {
+                        JFrame.getInstance().SetMessaggio("Aspetto...", Color.WHITE);
+                        while (gestioneConnessione.flagAltroHaDatoPunteggio == null) {
                             assert true;
                         }
-                        gestioneConnessione.flagAltroHaDatoPunteggio = false;
+                        if (gestioneConnessione.flagAltroHaDatoPunteggio){
+                            giocatoreLocale().AggiungiPunti(cartaButtata.getPunti() + cartaSelezionata.getPunti());
+                        }
+                        gestioneConnessione.flagAltroHaDatoPunteggio = null;
                     } else {
                         System.out.println("Errore nel togliere la carta dalla mano nella run della classe GestionePartita");
                     }
                     primaMano = false;
                 } else {
-                    if (!primaMano) {
+                    if (!primaMano && tavolo.GetMazzo().GetSize() > 0) {
                         while (!gestioneConnessione.flagAltroHaPescato) {
                             assert true;
                         }
                         gestioneConnessione.flagAltroHaPescato = false;
                         giocatoreLocale().AggiungiCartaAllaMano(tavolo.GetCarta(true));
                     }
+                    JFrame.getInstance().SetMessaggio("Aspetto...", Color.WHITE);
                     while (gestioneConnessione.flagCartaButtataDallAltro == null) {
                         assert true;
                     }
-                    Carta CartaButtataDallAltro = gestioneConnessione.flagCartaButtataDallAltro;
                     gestioneConnessione.flagCartaButtataDallAltro = null;
+                    JFrame.getInstance().SetMessaggio("Tocca a te", Color.BLUE);
                     while (JFrame.CartaSelezionata == null) {
                         assert true;
                     }
                     Carta cartaSelezionata = JFrame.CartaSelezionata;
                     JFrame.CartaSelezionata = null;
+                    JFrame.getInstance().SetMessaggio("", Color.WHITE);
                     if (giocatoreLocale().TogliCartaDallaMano(cartaSelezionata)) {
                         tavolo.AggiungiCartaSulTavolo(cartaSelezionata);
                         try {
@@ -111,8 +124,11 @@ public class GestionePartita extends Thread {
                             String risultato = tavolo.CalcoloChiHaVintoMano();
                             gestioneConnessione.Invia(risultato, gestioneConnessione.GetAddress());
                             if (risultato.equals("w;")) {
+                                JFrame.getInstance().SetMessaggio("Hai perso!", Color.red);
                                 turnoMio = false;
                             } else if (risultato.equals("l;")) {
+                                JFrame.getInstance().SetMessaggio("Hai vinto!", Color.green);
+                                giocatoreLocale().AggiungiPunti(cartaButtata.getPunti() + cartaSelezionata.getPunti());
                                 turnoMio = true;
                             }
                         } catch (SocketException ex) {
@@ -121,7 +137,12 @@ public class GestionePartita extends Thread {
                     }
                     primaMano = false;
                 }
-                //aspetto che o mando il risultato o arriva il risultato
+                try {
+                    sleep(300);
+                    //aspetto che o mando il risultato o arriva il risultato
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(GestionePartita.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
     }

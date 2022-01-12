@@ -41,6 +41,8 @@ public class Tavolo {
     }
 
     public Carta getBriscola() {
+        if (mazzo.vuoto())
+            return null;
         return briscola;
     }
     

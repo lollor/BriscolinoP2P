@@ -10,21 +10,16 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import static java.lang.Integer.parseInt;
 import static java.lang.Thread.sleep;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 
 /**
  *
@@ -138,7 +133,9 @@ public class JFrame extends javax.swing.JFrame {
             g.drawImage(vuota, xBriscola, yMazzo, WIDTH, HEIGHT, null);
         } else {
             g.drawImage(back, xMazzo, yMazzo, WIDTH, HEIGHT, null);
+            if (gestisci.GetPartita().tavolo.getBriscola() != null)
             g.drawImage(ImageIO.read(new FileInputStream(gestisci.GetPartita().tavolo.getBriscola().img)), xBriscola, yMazzo, WIDTH, HEIGHT, null);
+            else g.drawImage(vuota, xBriscola, yMazzo, WIDTH, HEIGHT, null);
         }
     }
 
@@ -189,9 +186,8 @@ public class JFrame extends javax.swing.JFrame {
 
     }
 
-    String text=""; Color foregroundColor = Color.BLACK;
+    private String text=""; private Color foregroundColor = Color.BLACK;
     public void SetMessaggio(String text, Color foregroundColor){
-        System.out.println("Cambio var messaggi");
         this.text = text;
         this.foregroundColor = foregroundColor;
     }
@@ -200,19 +196,21 @@ public class JFrame extends javax.swing.JFrame {
         Tavolo t = gestisci.GetPartita().tavolo;
         finito = true;
         //il giocatore sfidante sta sempre sopra mentre tu sempre sotto
-        punteggioSopra.setText(t.GetGiocatore(false).punteggio);
-        punteggioSotto.setText(t.GetGiocatore(true).punteggio);
+        punteggioSopra.setText(t.GetGiocatore(false).GetPunteggio());
+        punteggioSotto.setText(t.GetGiocatore(true).GetPunteggio());
 
-        if (parseInt(t.GetGiocatore(true).punteggio) > parseInt(t.GetGiocatore(false).punteggio)) {
+        if (t.GetGiocatore(true).punteggio > 60) {
             InfoIo.setText("hai vinto");
             InfoSfidante.setText("hai perso");
-        } else if (parseInt(t.GetGiocatore(true).punteggio) == parseInt(t.GetGiocatore(false).punteggio)) {
+        } else if (t.GetGiocatore(true).punteggio == 60) {
             InfoIo.setText("pareggio");
             InfoSfidante.setText("pareggio");
         } else {
             InfoIo.setText("hai perso");
             InfoSfidante.setText("hai vinto");
         }
+        SetMessaggio("", foregroundColor);
+        repaint();
     }
 
     //PER MOSTRARE LE CARTE SUL TAVOLO TI CONSIGLIO DI FARE UN THREAD CHE IN CONTINUAZIONE PRENDE L'ARRAY 
@@ -224,12 +222,12 @@ public class JFrame extends javax.swing.JFrame {
                 //mostra tutte le carte del tavolo
                 repaint();
                 try {
-                    Thread.sleep(200);
+                    Thread.sleep(100);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(JFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            repaint();
+            partitaFinita();
         }).start();
     }
 

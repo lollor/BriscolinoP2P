@@ -14,12 +14,12 @@ import java.util.ArrayList;
 public class Giocatore {
 
     String nome;
-    String punteggio;
+    int punteggio;
     ArrayList<Carta> mano;//tre carte che ha in mano il giocatore
 
     public Giocatore() {
         this.nome = "";
-        punteggio = "";
+        punteggio = 0;
         mano = new ArrayList<Carta>(0);
     }
 
@@ -32,6 +32,10 @@ public class Giocatore {
         return false;
     }
 
+    public void AggiungiPunti(int puntiDaAggiungere){
+        punteggio += puntiDaAggiungere;
+    }
+    
     public boolean TogliCartaDallaMano(Carta carta) {
         if (mano.size() > 0) {
             if (mano.remove(carta)) {
@@ -39,5 +43,9 @@ public class Giocatore {
             }
         }
         return false;
+    }
+    
+    public String GetPunteggio(){
+        return String.valueOf(punteggio);
     }
 }

@@ -74,10 +74,7 @@ public class Mazzo {
     }
 
     public boolean vuoto() {
-        if (mazzo.isEmpty()) {
-            return true;
-        }
-        return false;
+        return mazzo.isEmpty();
     }
 
     @Override

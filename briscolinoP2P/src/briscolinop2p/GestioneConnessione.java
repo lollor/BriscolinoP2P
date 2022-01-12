@@ -44,7 +44,7 @@ public class GestioneConnessione extends Thread {
     volatile boolean flagMazzoArrivato = false;
     volatile boolean flagAltroHaPescato = false;
     volatile Carta flagCartaButtataDallAltro = null;
-    volatile boolean flagAltroHaDatoPunteggio = false;
+    volatile Boolean flagAltroHaDatoPunteggio = null;
     volatile boolean flagAltroHaMandatoMazzo = false;
 
     public static synchronized GestioneConnessione getInstance() throws SocketException {
@@ -97,6 +97,7 @@ public class GestioneConnessione extends Thread {
                 if (faseConnessione == 0 && !connesso) {
                     if (JOptionPane.showConfirmDialog(null, resto.split(";")[0] + " (" + address + ") ha chiesto di connettersi. Accettare?", "Richiesta", JOptionPane.YES_NO_OPTION) == 0) {
                         mioNome = JOptionPane.showInputDialog("Inserire nome");
+                        if (mioNome.equals("")) mioNome = "default";
                         nomeMittente = resto.split(";")[0].trim();
                         ipAddress = address;
                         Invia("y;" + mioNome + ";", ipAddress);
@@ -159,10 +160,11 @@ public class GestioneConnessione extends Thread {
                 break;
             case 'b':
                 Carta carta = Carta.creaCarta(resto.split(";")[0].trim());
+                gestionePartita.cartaButtata = carta;
                 if (gestionePartita.tavolo.AggiungiCartaSulTavolo(carta)) {
                     flagCartaButtataDallAltro = carta;
-                    System.out.println("è il mio turno: "+gestionePartita.turnoMio);
-                    
+                    sleep(200);
+                    flagCartaButtataDallAltro = null;
                 } else {
                     System.out.println("Errore nell'aggiungere la carta sul tavolo nel case 'b' della funzione GestionePacchetto della classe GestioneConnessione");
                 }
@@ -176,14 +178,16 @@ public class GestioneConnessione extends Thread {
                 break;
             case 'l':
                 JFrame.getInstance().SetMessaggio("Hai perso!", Color.red);
-                flagAltroHaDatoPunteggio = true;
+                sleep(200);
                 gestionePartita.tavolo.PulisciCarteTavolo();
+                flagAltroHaDatoPunteggio = false;
                 gestionePartita.turnoMio = false;
                 break;
             case 'w':
                 JFrame.getInstance().SetMessaggio("Hai vinto!", Color.green);
-                flagAltroHaDatoPunteggio = true;
+                sleep(200);
                 gestionePartita.tavolo.PulisciCarteTavolo();
+                flagAltroHaDatoPunteggio = true;
                 gestionePartita.turnoMio = true;
                 break;
             default:
