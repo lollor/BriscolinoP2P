@@ -100,7 +100,8 @@ public class Tavolo {
         return carteMostrate;
     }
 
-    public String CalcoloChiHaVintoMano() {
+    public String CalcoloChiHaVintoMano() throws InterruptedException {
+        
         Carta carta0 = carteMostrate.get(0), carta1 = carteMostrate.get(1);
         PulisciCarteTavolo();
         if (briscola.getSeme() == carta0.getSeme() && briscola.getSeme() != carta1.getSeme()) {

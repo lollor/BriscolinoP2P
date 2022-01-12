@@ -182,6 +182,7 @@ public class GestioneConnessione extends Thread {
                 gestionePartita.tavolo.PulisciCarteTavolo();
                 flagAltroHaDatoPunteggio = false;
                 gestionePartita.turnoMio = false;
+                
                 break;
             case 'w':
                 JFrame.getInstance().SetMessaggio("Hai vinto!", Color.green);
@@ -189,6 +190,7 @@ public class GestioneConnessione extends Thread {
                 gestionePartita.tavolo.PulisciCarteTavolo();
                 flagAltroHaDatoPunteggio = true;
                 gestionePartita.turnoMio = true;
+                
                 break;
             default:
                 throw new AssertionError();

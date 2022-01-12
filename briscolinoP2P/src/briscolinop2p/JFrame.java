@@ -27,12 +27,13 @@ import javax.imageio.ImageIO;
  */
 public class JFrame extends javax.swing.JFrame {
 
+    public int click = 0;
     final int WIDTH = 100, HEIGHT = 147;
     final int xAv2 = 491, xAv1 = 370, xAv3 = 610, yAv = 40;
     final int xMazzo1 = 431, xMazzo2 = 558, yMazzo = 228;
     final int xM2 = 491, xM3 = 617, xM1 = 363, yM = 414;
     final int xMazzo = 125, xBriscola = 240;
-    final int xMessaggio = 55, yMessaggio = 523;
+    final int xMessaggio = 35, yMessaggio = 523;
     boolean finito = false;
     GestioneConnessione gestisci;
     volatile static Carta CartaSelezionata = null;
@@ -53,11 +54,10 @@ public class JFrame extends javax.swing.JFrame {
         instance = this;
     }
 
-    
-    public static JFrame getInstance(){
+    public static JFrame getInstance() {
         return instance;
     }
-    
+
     @Override
     public void paint(Graphics g) {
         Graphics offgc;
@@ -105,16 +105,18 @@ public class JFrame extends javax.swing.JFrame {
         } else {
             g.drawImage(vuota, xMazzo2, yMazzo, WIDTH, HEIGHT, null);
         }
+        stampaMazzo(t.GetCarteMostrate(), g);
         stampaManoSotto(t.GetGiocatore(true).mano, g);
         stampaManoSopra(t.GetGiocatore(false).mano, g);
-        stampaMazzo(t.GetCarteMostrate(), g);
-        
-        g.setFont(new Font("Arial", Font.BOLD, 48));
+
+        g.drawImage(ImageIO.read(new FileInputStream("src/briscolinop2p/logoBriscola.png")), 60, 50, 200, 136, null);
+        g.setFont(new Font("Rockwell", Font.BOLD, 48));
         g.setColor(foregroundColor);
         g.drawString(text, xMessaggio, yMessaggio);
     }
 
-    public void stampaMazzo(ArrayList<Carta> m, Graphics g) throws IOException {
+    public void stampaMazzo(ArrayList<Carta> m, Graphics g) throws IOException, InterruptedException {
+
         if (m.size() == 0) {
             g.drawImage(vuota, xMazzo1, yMazzo, WIDTH, HEIGHT, null);
             g.drawImage(vuota, xMazzo2, yMazzo, WIDTH, HEIGHT, null);
@@ -133,25 +135,26 @@ public class JFrame extends javax.swing.JFrame {
             g.drawImage(vuota, xBriscola, yMazzo, WIDTH, HEIGHT, null);
         } else {
             g.drawImage(back, xMazzo, yMazzo, WIDTH, HEIGHT, null);
-            if (gestisci.GetPartita().tavolo.getBriscola() != null)
-            g.drawImage(ImageIO.read(new FileInputStream(gestisci.GetPartita().tavolo.getBriscola().img)), xBriscola, yMazzo, WIDTH, HEIGHT, null);
-            else g.drawImage(vuota, xBriscola, yMazzo, WIDTH, HEIGHT, null);
+            if (gestisci.GetPartita().tavolo.getBriscola() != null) {
+                g.drawImage(ImageIO.read(new FileInputStream(gestisci.GetPartita().tavolo.getBriscola().img)), xBriscola, yMazzo, WIDTH, HEIGHT, null);
+            } else {
+                g.drawImage(vuota, xBriscola, yMazzo, WIDTH, HEIGHT, null);
+            }
         }
+
     }
 
     public void stampaManoSotto(ArrayList<Carta> m, Graphics g) throws IOException, InterruptedException {
+        sleep(500);
         if (m.size() == 3) {
             g.drawImage(ImageIO.read(new FileInputStream(m.get(0).img)), xM1, yM, WIDTH, HEIGHT, null);
             g.drawImage(ImageIO.read(new FileInputStream(m.get(1).img)), xM2, yM, WIDTH, HEIGHT, null);
-            sleep(500);
             g.drawImage(ImageIO.read(new FileInputStream(m.get(2).img)), xM3, yM, WIDTH, HEIGHT, null);
         } else if (m.size() == 2) {
             g.drawImage(ImageIO.read(new FileInputStream(m.get(0).img)), xM1, yM, WIDTH, HEIGHT, null);
-            sleep(500);
             g.drawImage(ImageIO.read(new FileInputStream(m.get(1).img)), xM2, yM, WIDTH, HEIGHT, null);
             g.drawImage(vuota, xM3, yM, WIDTH, HEIGHT, null);
         } else if (m.size() == 1) {
-            sleep(500);
             g.drawImage(ImageIO.read(new FileInputStream(m.get(0).img)), xM1, yM, WIDTH, HEIGHT, null);
             g.drawImage(vuota, xM2, yM, WIDTH, HEIGHT, null);
             g.drawImage(vuota, xM3, yM, WIDTH, HEIGHT, null);
@@ -186,28 +189,28 @@ public class JFrame extends javax.swing.JFrame {
 
     }
 
-    private String text=""; private Color foregroundColor = Color.BLACK;
-    public void SetMessaggio(String text, Color foregroundColor){
+    private String text = "";
+    private Color foregroundColor = Color.BLACK;
+
+    public void SetMessaggio(String text, Color foregroundColor) {
         this.text = text;
         this.foregroundColor = foregroundColor;
     }
-    
+
     public void partitaFinita() {
         Tavolo t = gestisci.GetPartita().tavolo;
         finito = true;
+        
+        
         //il giocatore sfidante sta sempre sopra mentre tu sempre sotto
-        punteggioSopra.setText(t.GetGiocatore(false).GetPunteggio());
-        punteggioSotto.setText(t.GetGiocatore(true).GetPunteggio());
+       
 
         if (t.GetGiocatore(true).punteggio > 60) {
-            InfoIo.setText("hai vinto");
-            InfoSfidante.setText("hai perso");
+            Util.ShowDialog("Hai Vinto! "+t.GetGiocatore(true).punteggio+"-"+(120-t.GetGiocatore(true).punteggio), "Partita Finita");
         } else if (t.GetGiocatore(true).punteggio == 60) {
-            InfoIo.setText("pareggio");
-            InfoSfidante.setText("pareggio");
+             Util.ShowDialog("Hai Pareggiato! 60-60 ", "Partita Finita");
         } else {
-            InfoIo.setText("hai perso");
-            InfoSfidante.setText("hai vinto");
+           Util.ShowDialog("Hai Perso! "+t.GetGiocatore(true).punteggio+"-"+(120-t.GetGiocatore(true).punteggio), "Partita Finita");
         }
         SetMessaggio("", foregroundColor);
         repaint();
@@ -222,7 +225,7 @@ public class JFrame extends javax.swing.JFrame {
                 //mostra tutte le carte del tavolo
                 repaint();
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(500);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(JFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -240,18 +243,11 @@ public class JFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        punteggioSotto = new javax.swing.JTextArea();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        punteggioSopra = new javax.swing.JTextArea();
-        jLabel2 = new javax.swing.JLabel();
         mazzo = new javax.swing.JLabel();
-        InfoIo = new javax.swing.JLabel();
-        InfoSfidante = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Briscola");
-        setBackground(new java.awt.Color(0, 102, 51));
+        setBackground(new java.awt.Color(0, 153, 0));
         setBounds(new java.awt.Rectangle(0, 0, 5, 5));
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         addMouseListener(new java.awt.event.MouseAdapter() {
@@ -260,18 +256,6 @@ public class JFrame extends javax.swing.JFrame {
             }
         });
 
-        punteggioSotto.setBackground(new java.awt.Color(204, 204, 204));
-        punteggioSotto.setColumns(20);
-        punteggioSotto.setRows(5);
-        jScrollPane1.setViewportView(punteggioSotto);
-
-        punteggioSopra.setBackground(new java.awt.Color(204, 204, 204));
-        punteggioSopra.setColumns(20);
-        punteggioSopra.setRows(5);
-        jScrollPane2.setViewportView(punteggioSopra);
-
-        jLabel2.setText("------------------------------");
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -279,44 +263,14 @@ public class JFrame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(125, 125, 125)
                 .addComponent(mazzo, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 618, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(InfoSfidante, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(57, 57, 57))
-                                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGap(57, 57, 57)))
-                            .addComponent(InfoIo, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(1, 1, 1)))
-                .addContainerGap())
+                .addContainerGap(908, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(41, 41, 41)
-                .addComponent(InfoSfidante, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 141, Short.MAX_VALUE)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(116, 116, 116)
-                        .addComponent(InfoIo, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(103, 103, 103))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(121, 121, 121)
-                        .addComponent(mazzo, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addGap(189, 189, 189)
+                .addComponent(mazzo, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(245, Short.MAX_VALUE))
         );
 
         pack();
@@ -324,25 +278,28 @@ public class JFrame extends javax.swing.JFrame {
 
     private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
         // TODO add your handling code here:
-        int mx = evt.getX();
-        int my = evt.getY();
-        ArrayList<Carta> mano = gestisci.GetPartita().tavolo.GetGiocatore(true).mano;
-        int lengthmano = mano.size();
+        if (click == 0) {
+            int mx = evt.getX();
+            int my = evt.getY();
+            ArrayList<Carta> mano = gestisci.GetPartita().tavolo.GetGiocatore(true).mano;
+            int lengthmano = mano.size();
 
-        if (mouseOver(mx, my, xM1, yM, WIDTH, HEIGHT)) {
-            if (lengthmano >= 1) {
-                CartaSelezionata = mano.get(0);
-            }
-        } else if (mouseOver(mx, my, xM2, yM, WIDTH, HEIGHT)) {
-            if (lengthmano >= 2) {
-                CartaSelezionata = mano.get(1);
-            }
-        } else if (mouseOver(mx, my, xM3, yM, WIDTH, HEIGHT)) {
-            if (lengthmano == 3) {
-                CartaSelezionata = mano.get(2);
+            if (mouseOver(mx, my, xM1, yM, WIDTH, HEIGHT)) {
+                if (lengthmano >= 1) {
+                    CartaSelezionata = mano.get(0);
+                }
+            } else if (mouseOver(mx, my, xM2, yM, WIDTH, HEIGHT)) {
+                if (lengthmano >= 2) {
+                    CartaSelezionata = mano.get(1);
+                }
+            } else if (mouseOver(mx, my, xM3, yM, WIDTH, HEIGHT)) {
+                if (lengthmano == 3) {
+                    CartaSelezionata = mano.get(2);
+                }
             }
         }
 
+        click++;
     }//GEN-LAST:event_formMousePressed
 
     /**
@@ -387,14 +344,7 @@ public class JFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel InfoIo;
-    private javax.swing.JLabel InfoSfidante;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel mazzo;
-    private javax.swing.JTextArea punteggioSopra;
-    private javax.swing.JTextArea punteggioSotto;
     // End of variables declaration//GEN-END:variables
 
 }

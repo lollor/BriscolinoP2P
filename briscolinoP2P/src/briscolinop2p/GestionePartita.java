@@ -68,9 +68,11 @@ public class GestionePartita extends Thread {
                     }
                     //prendo la carta
                     JFrame.getInstance().SetMessaggio("E' il tuo turno", Color.BLUE);
+                    JFrame.getInstance().click=0;
                     while (JFrame.CartaSelezionata == null) {
                         assert true;
                     }
+                    JFrame.getInstance().click=1;
                     Carta cartaSelezionata = JFrame.CartaSelezionata;
                     JFrame.CartaSelezionata = null;
                     JFrame.getInstance().SetMessaggio("", Color.WHITE);
@@ -111,9 +113,11 @@ public class GestionePartita extends Thread {
                     }
                     gestioneConnessione.flagCartaButtataDallAltro = null;
                     JFrame.getInstance().SetMessaggio("Tocca a te", Color.BLUE);
+                    JFrame.getInstance().click=0;
                     while (JFrame.CartaSelezionata == null) {
                         assert true;
                     }
+                    JFrame.getInstance().click=1;
                     Carta cartaSelezionata = JFrame.CartaSelezionata;
                     JFrame.CartaSelezionata = null;
                     JFrame.getInstance().SetMessaggio("", Color.WHITE);
@@ -133,6 +137,8 @@ public class GestionePartita extends Thread {
                             }
                         } catch (SocketException ex) {
                             System.out.println("Errore nell'invia della run della classe GestionePartita");
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(GestionePartita.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
                     primaMano = false;
