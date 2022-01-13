@@ -43,7 +43,11 @@ public class Tavolo {
     public Carta getBriscola() {
         return briscola;
     }
-    
+    public Carta getBriscolaVisiva(){
+        if (mazzo.vuoto() || mazzo == null)
+            return null;
+        return briscola;
+    }
     public synchronized Carta GetCarta(boolean inviareMessaggio) {
         Carta carta = mazzo.TogliCarta();
         GestioneConnessione g;

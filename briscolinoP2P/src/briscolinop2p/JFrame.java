@@ -135,7 +135,7 @@ public class JFrame extends javax.swing.JFrame {
             g.drawImage(vuota, xBriscola, yMazzo, WIDTH, HEIGHT, null);
         } else {
             g.drawImage(back, xMazzo, yMazzo, WIDTH, HEIGHT, null);
-            if (gestisci.GetPartita().tavolo.getBriscola() != null) {
+            if (gestisci.GetPartita().tavolo.getBriscolaVisiva() != null) {
                 g.drawImage(ImageIO.read(new FileInputStream(gestisci.GetPartita().tavolo.getBriscola().img)), xBriscola, yMazzo, WIDTH, HEIGHT, null);
             } else {
                 g.drawImage(vuota, xBriscola, yMazzo, WIDTH, HEIGHT, null);
@@ -301,7 +301,7 @@ public class JFrame extends javax.swing.JFrame {
 
         click++;
     }//GEN-LAST:event_formMousePressed
-
+     
     /**
      * @param args the command line arguments
      */
