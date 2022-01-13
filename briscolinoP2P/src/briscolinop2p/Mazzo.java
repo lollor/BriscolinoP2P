@@ -59,12 +59,18 @@ public class Mazzo {
 
     public Carta TogliCarta() {
         if (!gestionePartita.partitaFinita) {
-            Carta carta = mazzo.get(0);
-            if (mazzo.remove(carta)) {
-                return carta;
-            } else {
+            Carta carta = null;
+            try {
+                carta = mazzo.get(0);
+                if (mazzo.remove(carta)) {
+                    return carta;
+                } else {
+                    return null;
+                }
+            } catch (Exception e) {
                 return null;
             }
+
         }
         return null;
     }
@@ -74,9 +80,10 @@ public class Mazzo {
     }
 
     public boolean vuoto() {
-        if(mazzo.size()==0)
-        return true;
-        
+        if (mazzo.size() == 0) {
+            return true;
+        }
+
         return false;
     }
 

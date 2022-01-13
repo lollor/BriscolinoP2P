@@ -57,9 +57,12 @@ public class GestionePartita extends Thread {
                     break;
                 }
                 if (turnoMio) {
-                    if (!primaMano && tavolo.GetMazzo().GetSize() > 0) {
+                    if (!primaMano) {
                         //pesco
-                        giocatoreLocale().AggiungiCartaAllaMano(tavolo.GetCarta(true));
+                        Carta carta = tavolo.GetCarta(true);
+                        if (carta != null){
+                            giocatoreLocale().AggiungiCartaAllaMano(carta);
+                        }
                         //e aspetto che l'altro pesca
                         while (!gestioneConnessione.flagAltroHaPescato) {
                             assert true;
@@ -100,12 +103,15 @@ public class GestionePartita extends Thread {
                     }
                     primaMano = false;
                 } else {
-                    if (!primaMano && tavolo.GetMazzo().GetSize() > 0) {
+                    if (!primaMano) {
                         while (!gestioneConnessione.flagAltroHaPescato) {
                             assert true;
                         }
                         gestioneConnessione.flagAltroHaPescato = false;
-                        giocatoreLocale().AggiungiCartaAllaMano(tavolo.GetCarta(true));
+                        Carta carta = tavolo.GetCarta(true);
+                        if (carta != null){
+                            giocatoreLocale().AggiungiCartaAllaMano(carta);
+                        }
                     }
                     JFrame.getInstance().SetMessaggio("Aspetto...", Color.WHITE);
                     while (gestioneConnessione.flagCartaButtataDallAltro == null) {
@@ -125,6 +131,7 @@ public class GestionePartita extends Thread {
                         tavolo.AggiungiCartaSulTavolo(cartaSelezionata);
                         try {
                             gestioneConnessione.Invia("b;" + cartaSelezionata + ";", gestioneConnessione.GetAddress());
+                            sleep(100);
                             String risultato = tavolo.CalcoloChiHaVintoMano();
                             gestioneConnessione.Invia(risultato, gestioneConnessione.GetAddress());
                             if (risultato.equals("w;")) {

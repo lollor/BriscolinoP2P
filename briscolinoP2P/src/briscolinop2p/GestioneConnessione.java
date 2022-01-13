@@ -97,7 +97,9 @@ public class GestioneConnessione extends Thread {
                 if (faseConnessione == 0 && !connesso) {
                     if (JOptionPane.showConfirmDialog(null, resto.split(";")[0] + " (" + address + ") ha chiesto di connettersi. Accettare?", "Richiesta", JOptionPane.YES_NO_OPTION) == 0) {
                         mioNome = JOptionPane.showInputDialog("Inserire nome");
-                        if (mioNome.equals("")) mioNome = "default";
+                        if (mioNome.equals("")) {
+                            mioNome = "default";
+                        }
                         nomeMittente = resto.split(";")[0].trim();
                         ipAddress = address;
                         Invia("y;" + mioNome + ";", ipAddress);
@@ -170,11 +172,9 @@ public class GestioneConnessione extends Thread {
                 }
                 break;
             case 'p':
-                Carta c = gestionePartita.tavolo.GetCarta(false);
-                gestionePartita.giocatoreEsterno().AggiungiCartaAllaMano(c);
+                if (!gestionePartita.tavolo.GetMazzo().vuoto())
+                    gestionePartita.tavolo.GetCarta(false);
                 flagAltroHaPescato = true;
-                break;
-            case 'f':
                 break;
             case 'l':
                 JFrame.getInstance().SetMessaggio("Hai perso!", Color.red);
@@ -182,7 +182,7 @@ public class GestioneConnessione extends Thread {
                 gestionePartita.tavolo.PulisciCarteTavolo();
                 flagAltroHaDatoPunteggio = false;
                 gestionePartita.turnoMio = false;
-                
+
                 break;
             case 'w':
                 JFrame.getInstance().SetMessaggio("Hai vinto!", Color.green);
@@ -190,7 +190,7 @@ public class GestioneConnessione extends Thread {
                 gestionePartita.tavolo.PulisciCarteTavolo();
                 flagAltroHaDatoPunteggio = true;
                 gestionePartita.turnoMio = true;
-                
+
                 break;
             default:
                 throw new AssertionError();
@@ -237,13 +237,13 @@ public class GestioneConnessione extends Thread {
     }
 
     public void Invia(String data, InetAddress address) throws SocketException {
-        System.out.println("OUT [" + data + "] [" + address + "]");
         new Thread(() -> {
             byte[] bufRisposta = data.getBytes();
             try {
                 socketInvio.send(new DatagramPacket(bufRisposta, bufRisposta.length, address, OTHERPORT));
+                System.out.println("OUT [" + data + "] [" + address + "]");
             } catch (IOException ex) {
-                Logger.getLogger(GestioneConnessione.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("Errore nella send");
             }
         }).start();
     }

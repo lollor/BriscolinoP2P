@@ -41,8 +41,6 @@ public class Tavolo {
     }
 
     public Carta getBriscola() {
-        if (mazzo.vuoto())
-            return null;
         return briscola;
     }
     
@@ -101,14 +99,21 @@ public class Tavolo {
     }
 
     public String CalcoloChiHaVintoMano() throws InterruptedException {
-        
+        //-------------------------------------
+        //LA CARTA 0 E' LA SUA E LA 1 E' LA MIA
+        //-------------------------------------
         Carta carta0 = carteMostrate.get(0), carta1 = carteMostrate.get(1);
         PulisciCarteTavolo();
+        //se la carta che ha buttato lui è la briscola e la mia no
         if (briscola.getSeme() == carta0.getSeme() && briscola.getSeme() != carta1.getSeme()) {
             return "w;";
-        } else if (briscola.getSeme() != carta0.getSeme() && briscola.getSeme() == carta1.getSeme()) {
+        } 
+        //se la carta che lui ha buttato non è la briscola e la mia si
+        else if (briscola.getSeme() != carta0.getSeme() && briscola.getSeme() == carta1.getSeme()) {
             return "l;";
-        } else if (briscola.getSeme() == carta0.getSeme() && briscola.getSeme() == carta1.getSeme()) {
+        } 
+        //se entrambi abbiamo la briscola
+        else if (briscola.getSeme() == carta0.getSeme() && briscola.getSeme() == carta1.getSeme()) {
             if (carta0.getPunti() > carta1.getPunti()) {
                 return "w;";
             } else if (carta0.getPunti() < carta1.getPunti()) {
@@ -120,7 +125,9 @@ public class Tavolo {
                     return "l;";
                 }
             }
-        } else if (carta0.getSeme() == carta1.getSeme()) {
+        } 
+        //se entrambi abbiamo delle non briscole
+        else if (carta0.getSeme() == carta1.getSeme() && briscola.getSeme() != carta0.getSeme()) {
             if (carta0.getPunti() > carta1.getPunti()) {
                 return "w;";
             } else if (carta0.getPunti() < carta1.getPunti()) {
@@ -135,6 +142,7 @@ public class Tavolo {
         } else if (carta0.getSeme() != carta1.getSeme() && briscola.getSeme() != carta0.getSeme() && briscola.getSeme() != carta1.getSeme()){
             return "w;";
         }
+        
         return null;
     }
 }
