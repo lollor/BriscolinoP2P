@@ -125,6 +125,7 @@ public class GestionePartita extends Thread {
                         tavolo.AggiungiCartaSulTavolo(cartaSelezionata);
                         try {
                             gestioneConnessione.Invia("b;" + cartaSelezionata + ";", gestioneConnessione.GetAddress());
+                            sleep(100);
                             String risultato = tavolo.CalcoloChiHaVintoMano();
                             gestioneConnessione.Invia(risultato, gestioneConnessione.GetAddress());
                             if (risultato.equals("w;")) {
