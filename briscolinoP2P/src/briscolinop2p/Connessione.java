@@ -29,15 +29,16 @@ public class Connessione extends javax.swing.JFrame {
     public Connessione() throws SocketException {
         initComponents();
         this.getContentPane().setBackground(Color.cyan);
-        g = GestioneConnessione.getInstance();
+        g =  GestioneConnessione.getInstance();
         g.start();
         instance = this;
     }
 
-    private Connessione(boolean var){
+    public Connessione(boolean var) throws SocketException{
         initComponents();
         this.getContentPane().setBackground(Color.cyan);
         instance = this;
+        g =  GestioneConnessione.getInstance();
     }
     
     private static Connessione instance = null;
@@ -169,7 +170,7 @@ public class Connessione extends javax.swing.JFrame {
         JFrame a;
         try {
             a = new JFrame();
-            this.setVisible(false);
+            this.dispose();
             a.start(null);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Connessione.class.getName()).log(Level.SEVERE, null, ex);

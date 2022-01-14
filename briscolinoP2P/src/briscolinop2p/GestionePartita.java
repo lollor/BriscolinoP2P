@@ -25,6 +25,7 @@ public class GestionePartita extends Thread {
     boolean partitaFinita;
     boolean turnoMio;
     public Tavolo tavolo;
+    static boolean startato = false;
 
     public GestionePartita() throws SocketException {
         istanza = this;
@@ -48,6 +49,7 @@ public class GestionePartita extends Thread {
     Carta cartaButtata;
     @Override
     public void run() {
+        startato = true;
         while (true) {
             while (!partitaFinita) {
                 tavolo.PulisciCarteTavolo();
@@ -195,6 +197,7 @@ public class GestionePartita extends Thread {
             }
             this.turnoMio = true;
         }
+        Thread.currentThread().isAlive()
         start();
     }
 

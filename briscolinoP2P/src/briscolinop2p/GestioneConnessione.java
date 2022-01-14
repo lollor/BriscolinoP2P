@@ -26,7 +26,7 @@ import jdk.jshell.spi.ExecutionControl;
 public class GestioneConnessione extends Thread {
 
     private final int THISPORT = 12345;
-    private final int OTHERPORT = 12346;
+    private final int OTHERPORT = 12345;
 
     private static GestioneConnessione istanza = null;
     private DatagramSocket socketRicezione;
@@ -248,6 +248,12 @@ public class GestioneConnessione extends Thread {
         }).start();
     }
 
+    public void ChiudiConnessione(){
+        this.connesso = false;
+        this.faseConnessione = 0;
+        ipAddress = null;
+    }
+    
     public InetAddress GetAddress() {
         return ipAddress;
     }
