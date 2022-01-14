@@ -99,10 +99,7 @@ public class JFrame extends javax.swing.JFrame {
     }
 
     public void grafica(Graphics g) throws SocketException, IOException, InterruptedException {
-        if(finito==true){
-           partitaFinita(); 
-        }else{
-             Tavolo t = gestisci.GetPartita().tavolo;
+        Tavolo t = gestisci.GetPartita().tavolo;
 
         stampaMazzo(t.GetCarteMostrate(), g);
         stampaManoSotto(t.GetGiocatore(true).mano, g);
@@ -112,7 +109,6 @@ public class JFrame extends javax.swing.JFrame {
         g.setFont(new Font("Rockwell", Font.BOLD, 48));
         g.setColor(foregroundColor);
         g.drawString(text, xMessaggio, yMessaggio);
-        }    
     }
 
     public void stampaMazzo(ArrayList<Carta> m, Graphics g) throws IOException, InterruptedException {
@@ -197,9 +193,10 @@ public class JFrame extends javax.swing.JFrame {
         this.foregroundColor = foregroundColor;
     }
 
-    public void partitaFinita() throws FileNotFoundException, IOException, InterruptedException {
+    public void partitaFinita() throws FileNotFoundException, IOException {
         Tavolo t = gestisci.GetPartita().tavolo;
         finito = true;
+
         Graphics graphics = getGraphics();
         //il giocatore sfidante sta sempre sopra mentre tu sempre sotto
 
@@ -218,7 +215,6 @@ public class JFrame extends javax.swing.JFrame {
         graphics.setFont(new Font("Rockwell", Font.BOLD, 70));
         graphics.setColor(Color.BLACK);
         graphics.drawString(t.GetGiocatore(true).punteggio+"-"+(120-t.GetGiocatore(true).punteggio), 450, 500);
-        Thread.sleep(500000);
 
     }
 
@@ -236,7 +232,13 @@ public class JFrame extends javax.swing.JFrame {
                     Logger.getLogger(JFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-           
+            try {
+                
+                partitaFinita();                
+                
+            } catch (IOException ex) {
+                Logger.getLogger(JFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }).start();
     }
 
@@ -312,10 +314,8 @@ public class JFrame extends javax.swing.JFrame {
                     Logger.getLogger(JFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 c.setVisible(true);
-                finito=false;
-                this.setVisible(false);
+                this.dispose();
                 
-               
             }
         }
 

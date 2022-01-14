@@ -10,7 +10,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -52,7 +51,7 @@ public class JFrame extends javax.swing.JFrame {
         mostraCarteSulTavolo();
         vuota = ImageIO.read(new FileInputStream("../img_carte/vuota.gif"));
         back = ImageIO.read(new FileInputStream("../img_carte/back.gif"));
-        instance = this;       
+        instance = this;
     }
 
     public static JFrame getInstance() {
@@ -99,31 +98,32 @@ public class JFrame extends javax.swing.JFrame {
     }
 
     public void grafica(Graphics g) throws SocketException, IOException, InterruptedException {
-        if(finito==true){
-           partitaFinita(); 
-        }else{
-             Tavolo t = gestisci.GetPartita().tavolo;
-
+        Tavolo t = gestisci.GetPartita().tavolo;
+        if (!t.GetMazzo().vuoto()) {
+            //se il mazzo non e vuoto stampo la carta mazzo
+            g.drawImage(back, xMazzo2, yMazzo, WIDTH, HEIGHT, null);
+        } else {
+            g.drawImage(vuota, xMazzo2, yMazzo, WIDTH, HEIGHT, null);
+        }
         stampaMazzo(t.GetCarteMostrate(), g);
         stampaManoSotto(t.GetGiocatore(true).mano, g);
-        stampaManoSopra(t.GetGiocatore(true).mano, g);
+        stampaManoSopra(t.GetGiocatore(false).mano, g);
 
         g.drawImage(ImageIO.read(new FileInputStream("src/briscolinop2p/logoBriscola.png")), 60, 50, 200, 136, null);
         g.setFont(new Font("Rockwell", Font.BOLD, 48));
         g.setColor(foregroundColor);
         g.drawString(text, xMessaggio, yMessaggio);
-        }    
     }
 
     public void stampaMazzo(ArrayList<Carta> m, Graphics g) throws IOException, InterruptedException {
 
         if (m.size() == 0) {
-            //g.drawImage(vuota, xMazzo1, yMazzo, WIDTH, HEIGHT, null);
-            //g.drawImage(vuota, xMazzo2, yMazzo, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xMazzo1, yMazzo, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xMazzo2, yMazzo, WIDTH, HEIGHT, null);
         }
         if (m.size() == 1) {
             g.drawImage(ImageIO.read(new FileInputStream(m.get(0).img)), xMazzo1, yMazzo, WIDTH, HEIGHT, null);
-            //g.drawImage(vuota, xMazzo2, yMazzo, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xMazzo2, yMazzo, WIDTH, HEIGHT, null);
         }
         if (m.size() == 2) {
             g.drawImage(ImageIO.read(new FileInputStream(m.get(0).img)), xMazzo1, yMazzo, WIDTH, HEIGHT, null);
@@ -131,14 +131,14 @@ public class JFrame extends javax.swing.JFrame {
         }
 
         if (Tavolo.getTavolo().GetMazzo().vuoto()) {
-            // g.drawImage(vuota, xMazzo, yMazzo, WIDTH, HEIGHT, null);
-            //g.drawImage(vuota, xBriscola, yMazzo, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xMazzo, yMazzo, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xBriscola, yMazzo, WIDTH, HEIGHT, null);
         } else {
             g.drawImage(back, xMazzo, yMazzo, WIDTH, HEIGHT, null);
-            if (gestisci.GetPartita().tavolo.getBriscolaVisiva() != null) {
+            if (gestisci.GetPartita().tavolo.getBriscola() != null) {
                 g.drawImage(ImageIO.read(new FileInputStream(gestisci.GetPartita().tavolo.getBriscola().img)), xBriscola, yMazzo, WIDTH, HEIGHT, null);
             } else {
-                //g.drawImage(vuota, xBriscola, yMazzo, WIDTH, HEIGHT, null);
+                g.drawImage(vuota, xBriscola, yMazzo, WIDTH, HEIGHT, null);
             }
         }
 
@@ -153,15 +153,15 @@ public class JFrame extends javax.swing.JFrame {
         } else if (m.size() == 2) {
             g.drawImage(ImageIO.read(new FileInputStream(m.get(0).img)), xM1, yM, WIDTH, HEIGHT, null);
             g.drawImage(ImageIO.read(new FileInputStream(m.get(1).img)), xM2, yM, WIDTH, HEIGHT, null);
-            //g.drawImage(vuota, xM3, yM, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xM3, yM, WIDTH, HEIGHT, null);
         } else if (m.size() == 1) {
             g.drawImage(ImageIO.read(new FileInputStream(m.get(0).img)), xM1, yM, WIDTH, HEIGHT, null);
-            //g.drawImage(vuota, xM2, yM, WIDTH, HEIGHT, null);
-            //g.drawImage(vuota, xM3, yM, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xM2, yM, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xM3, yM, WIDTH, HEIGHT, null);
         } else {
-            //g.drawImage(vuota, xM1, yM, WIDTH, HEIGHT, null);
-            //g.drawImage(vuota, xM2, yM, WIDTH, HEIGHT, null);
-            //g.drawImage(vuota, xM3, yM, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xM1, yM, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xM2, yM, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xM3, yM, WIDTH, HEIGHT, null);
         }
     }
 
@@ -175,16 +175,16 @@ public class JFrame extends javax.swing.JFrame {
             g.drawImage(back, xAv1, yAv, WIDTH, HEIGHT, null);
             //sleep(500);
             g.drawImage(back, xAv2, yAv, WIDTH, HEIGHT, null);
-            //g.drawImage(vuota, xAv3, yAv, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xAv3, yAv, WIDTH, HEIGHT, null);
         } else if (m.size() == 1) {
             //sleep(500);
             g.drawImage(back, xAv1, yAv, WIDTH, HEIGHT, null);
-            //g.drawImage(vuota, xAv2, yAv, WIDTH, HEIGHT, null);
-            //g.drawImage(vuota, xAv3, yAv, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xAv2, yAv, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xAv3, yAv, WIDTH, HEIGHT, null);
         } else {
-            //g.drawImage(vuota, xAv1, yAv, WIDTH, HEIGHT, null);
-            //g.drawImage(vuota, xAv2, yAv, WIDTH, HEIGHT, null);
-            // g.drawImage(vuota, xAv3, yAv, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xAv1, yAv, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xAv2, yAv, WIDTH, HEIGHT, null);
+            g.drawImage(vuota, xAv3, yAv, WIDTH, HEIGHT, null);
         }
 
     }
@@ -197,29 +197,23 @@ public class JFrame extends javax.swing.JFrame {
         this.foregroundColor = foregroundColor;
     }
 
-    public void partitaFinita() throws FileNotFoundException, IOException, InterruptedException {
+    public void partitaFinita() {
         Tavolo t = gestisci.GetPartita().tavolo;
         finito = true;
-        Graphics graphics = getGraphics();
-        //il giocatore sfidante sta sempre sopra mentre tu sempre sotto
-
-        graphics.clearRect(0, 0, 1500, 600);
         
-        if (t.GetGiocatore(true).punteggio > 60) {
-            graphics.drawImage(ImageIO.read(new FileInputStream("src/briscolinop2p/win.png")), 250, 180, null);
-            //Util.ShowDialog("Hai Vinto! "+t.GetGiocatore(true).punteggio+"-"+(120-t.GetGiocatore(true).punteggio), "Partita Finita");
-        } else if (t.GetGiocatore(true).punteggio == 60) {
-            graphics.drawImage(ImageIO.read(new FileInputStream("src/briscolinop2p/pareggio.png")), 250, 180, null);
-            //Util.ShowDialog("Hai Pareggiato! 60-60 ", "Partita Finita");
-        } else {
-            graphics.drawImage(ImageIO.read(new FileInputStream("src/briscolinop2p/lose.png")), 250, 180, null);
-            //Util.ShowDialog("Hai Perso! "+t.GetGiocatore(true).punteggio+"-"+(120-t.GetGiocatore(true).punteggio), "Partita Finita");
-        }
-        graphics.setFont(new Font("Rockwell", Font.BOLD, 70));
-        graphics.setColor(Color.BLACK);
-        graphics.drawString(t.GetGiocatore(true).punteggio+"-"+(120-t.GetGiocatore(true).punteggio), 450, 500);
-        Thread.sleep(500000);
+        
+        //il giocatore sfidante sta sempre sopra mentre tu sempre sotto
+       
 
+        if (t.GetGiocatore(true).punteggio > 60) {
+            Util.ShowDialog("Hai Vinto! "+t.GetGiocatore(true).punteggio+"-"+(120-t.GetGiocatore(true).punteggio), "Partita Finita");
+        } else if (t.GetGiocatore(true).punteggio == 60) {
+             Util.ShowDialog("Hai Pareggiato! 60-60 ", "Partita Finita");
+        } else {
+           Util.ShowDialog("Hai Perso! "+t.GetGiocatore(true).punteggio+"-"+(120-t.GetGiocatore(true).punteggio), "Partita Finita");
+        }
+        SetMessaggio("", foregroundColor);
+        repaint();
     }
 
     //PER MOSTRARE LE CARTE SUL TAVOLO TI CONSIGLIO DI FARE UN THREAD CHE IN CONTINUAZIONE PRENDE L'ARRAY 
@@ -236,7 +230,7 @@ public class JFrame extends javax.swing.JFrame {
                     Logger.getLogger(JFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-           
+            partitaFinita();
         }).start();
     }
 
@@ -302,20 +296,6 @@ public class JFrame extends javax.swing.JFrame {
                 if (lengthmano == 3) {
                     CartaSelezionata = mano.get(2);
                 }
-            }
-            if (finito) {
-                Connessione c = null;
-                try {
-                    c = new Connessione(false);
-                    gestisci.ChiudiConnessione();
-                } catch (SocketException ex) {
-                    Logger.getLogger(JFrame.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                c.setVisible(true);
-                finito=false;
-                this.setVisible(false);
-                
-               
             }
         }
 

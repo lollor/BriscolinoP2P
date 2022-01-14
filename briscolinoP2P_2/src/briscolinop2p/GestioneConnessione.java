@@ -25,8 +25,8 @@ import jdk.jshell.spi.ExecutionControl;
  */
 public class GestioneConnessione extends Thread {
 
-    private final int THISPORT = 12346;
-    private final int OTHERPORT = 12345;
+    private final int THISPORT = 12345;
+    private final int OTHERPORT = 12346;
 
     private static GestioneConnessione istanza = null;
     private DatagramSocket socketRicezione;

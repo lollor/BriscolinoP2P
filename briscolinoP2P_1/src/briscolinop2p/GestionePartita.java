@@ -25,7 +25,6 @@ public class GestionePartita extends Thread {
     boolean partitaFinita;
     boolean turnoMio;
     public Tavolo tavolo;
-    static boolean startato = false;
 
     public GestionePartita() throws SocketException {
         istanza = this;
@@ -44,35 +43,23 @@ public class GestionePartita extends Thread {
         return istanza;
     }
 
-    public void azzera() throws SocketException {
-        this.partitaFinita = false;
-        this.sonoMazziere = false;
-        this.gestioneConnessione = GestioneConnessione.getInstance();
-        this.tavolo = new Tavolo();
-    }
-
     boolean primaMano = true;
     //boolean hoVintoUltimaMano = false;
     Carta cartaButtata;
-
     @Override
     public void run() {
-        startato = true;
         while (true) {
             while (!partitaFinita) {
                 tavolo.PulisciCarteTavolo();
-                if (tavolo.GetMazzo().GetSize() == 0 && giocatoreLocale().mano.isEmpty()) {
+                if (tavolo.GetMazzo().GetSize() == 0 && giocatoreLocale().mano.isEmpty()){
                     partitaFinita = true;
                     JFrame.getInstance().finito = true;
                     break;
                 }
                 if (turnoMio) {
-                    if (!primaMano) {
+                    if (!primaMano && tavolo.GetMazzo().GetSize() > 0) {
                         //pesco
-                        Carta carta = tavolo.GetCarta(true);
-                        if (carta != null) {
-                            giocatoreLocale().AggiungiCartaAllaMano(carta);
-                        }
+                        giocatoreLocale().AggiungiCartaAllaMano(tavolo.GetCarta(true));
                         //e aspetto che l'altro pesca
                         while (!gestioneConnessione.flagAltroHaPescato) {
                             assert true;
@@ -81,11 +68,11 @@ public class GestionePartita extends Thread {
                     }
                     //prendo la carta
                     JFrame.getInstance().SetMessaggio("E' il tuo turno", Color.BLUE);
-                    JFrame.getInstance().click = 0;
+                    JFrame.getInstance().click=0;
                     while (JFrame.CartaSelezionata == null) {
                         assert true;
                     }
-                    JFrame.getInstance().click = 1;
+                    JFrame.getInstance().click=1;
                     Carta cartaSelezionata = JFrame.CartaSelezionata;
                     JFrame.CartaSelezionata = null;
                     JFrame.getInstance().SetMessaggio("", Color.WHITE);
@@ -104,7 +91,7 @@ public class GestionePartita extends Thread {
                         while (gestioneConnessione.flagAltroHaDatoPunteggio == null) {
                             assert true;
                         }
-                        if (gestioneConnessione.flagAltroHaDatoPunteggio) {
+                        if (gestioneConnessione.flagAltroHaDatoPunteggio){
                             giocatoreLocale().AggiungiPunti(cartaButtata.getPunti() + cartaSelezionata.getPunti());
                         }
                         gestioneConnessione.flagAltroHaDatoPunteggio = null;
@@ -113,15 +100,12 @@ public class GestionePartita extends Thread {
                     }
                     primaMano = false;
                 } else {
-                    if (!primaMano) {
+                    if (!primaMano && tavolo.GetMazzo().GetSize() > 0) {
                         while (!gestioneConnessione.flagAltroHaPescato) {
                             assert true;
                         }
                         gestioneConnessione.flagAltroHaPescato = false;
-                        Carta carta = tavolo.GetCarta(true);
-                        if (carta != null) {
-                            giocatoreLocale().AggiungiCartaAllaMano(carta);
-                        }
+                        giocatoreLocale().AggiungiCartaAllaMano(tavolo.GetCarta(true));
                     }
                     JFrame.getInstance().SetMessaggio("Aspetto...", Color.WHITE);
                     while (gestioneConnessione.flagCartaButtataDallAltro == null) {
@@ -129,11 +113,11 @@ public class GestionePartita extends Thread {
                     }
                     gestioneConnessione.flagCartaButtataDallAltro = null;
                     JFrame.getInstance().SetMessaggio("Tocca a te", Color.BLUE);
-                    JFrame.getInstance().click = 0;
+                    JFrame.getInstance().click=0;
                     while (JFrame.CartaSelezionata == null) {
                         assert true;
                     }
-                    JFrame.getInstance().click = 1;
+                    JFrame.getInstance().click=1;
                     Carta cartaSelezionata = JFrame.CartaSelezionata;
                     JFrame.CartaSelezionata = null;
                     JFrame.getInstance().SetMessaggio("", Color.WHITE);
@@ -141,7 +125,6 @@ public class GestionePartita extends Thread {
                         tavolo.AggiungiCartaSulTavolo(cartaSelezionata);
                         try {
                             gestioneConnessione.Invia("b;" + cartaSelezionata + ";", gestioneConnessione.GetAddress());
-                            sleep(100);
                             String risultato = tavolo.CalcoloChiHaVintoMano();
                             gestioneConnessione.Invia(risultato, gestioneConnessione.GetAddress());
                             if (risultato.equals("w;")) {
@@ -176,7 +159,7 @@ public class GestionePartita extends Thread {
         System.out.println("Ho settato nomi giocatori");
     }
 
-    public void IniziaPartita(boolean sonoMazziere) throws InterruptedException, SocketException {
+    public void IniziaPartita(boolean sonoMazziere) throws InterruptedException {
         System.out.println("Iniziata partita. Sono mazziere = " + sonoMazziere);
         this.sonoMazziere = sonoMazziere;
         if (sonoMazziere) {
@@ -205,12 +188,7 @@ public class GestionePartita extends Thread {
             }
             this.turnoMio = true;
         }
-        if (this.isAlive()) {
-            azzera();
-        } else {
-            start();
-        }
-
+        start();
     }
 
     public boolean InviaMazzo() {
